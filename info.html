@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Olefin Metathesis — A Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e4;
+    --paper-dk: #ede6d3;
+    --ink: #1a2433;
+    --ink-soft: #3a4657;
+    --rule: #c8bda0;
+    --rule-soft: #e1d7bd;
+    --moss: #2d5f3f;
+    --moss-dk: #214830;
+    --rust: #b8543d;
+    --sepia: #a67b4a;
+    --gold: #c69a5c;
+    --hi: #fef9e7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      radial-gradient(ellipse at 15% 20%, rgba(198, 154, 92, 0.08), transparent 55%),
+      radial-gradient(ellipse at 85% 75%, rgba(45, 95, 63, 0.06), transparent 55%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.4  0 0 0 0 0.35  0 0 0 0 0.25  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 48px 96px;
+  }
+
+  /* ===== MASTHEAD ===== */
+  .masthead {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+  .masthead::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -5px;
+    height: 1px;
+    background: var(--rule);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.4;
+  }
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 50, "WONK" 1;
+    font-weight: 500;
+    font-size: clamp(42px, 6vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  h1.title em {
+    font-style: italic;
+    color: var(--moss);
+    font-weight: 400;
+  }
+  .lede {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 21px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-style: italic;
+    max-width: 640px;
+    margin-top: 12px;
+  }
+  .meta {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .meta span strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ===== NOBEL RIBBON ===== */
+  .nobel {
+    margin-top: 28px;
+    padding: 14px 20px;
+    border: 1px solid var(--gold);
+    background: linear-gradient(135deg, rgba(198, 154, 92, 0.12), rgba(198, 154, 92, 0.04));
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14.5px;
+  }
+  .nobel .medal {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #e5b974, #9c7326);
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    color: var(--paper);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 12px;
+    box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* ===== TOC ===== */
+  nav.toc {
+    margin: 40px 0 56px;
+    padding: 24px 28px;
+    background: rgba(237, 230, 211, 0.55);
+    border-left: 3px solid var(--moss);
+    font-size: 14.5px;
+  }
+  nav.toc h6 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  nav.toc ol {
+    list-style: none;
+    counter-reset: toc;
+    column-count: 2;
+    column-gap: 32px;
+  }
+  nav.toc li {
+    counter-increment: toc;
+    padding: 4px 0;
+    break-inside: avoid;
+  }
+  nav.toc li::before {
+    content: counter(toc, upper-roman) ".";
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    margin-right: 8px;
+    font-weight: 500;
+  }
+  nav.toc a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--rule);
+    transition: all 0.2s;
+  }
+  nav.toc a:hover {
+    color: var(--moss);
+    border-bottom-style: solid;
+    border-bottom-color: var(--moss);
+  }
+
+  /* ===== SECTIONS ===== */
+  section {
+    margin-bottom: 64px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-variation-settings: "SOFT" 30;
+    font-size: 32px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 0;
+  }
+  h2::before {
+    content: attr(data-num);
+    position: absolute;
+    left: -56px;
+    top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  @media (max-width: 900px) {
+    h2::before { position: static; display: block; margin-bottom: 4px; }
+  }
+  h2 + .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--sepia);
+    margin-bottom: 20px;
+    display: block;
+  }
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 32px 0 10px;
+    color: var(--moss-dk);
+  }
+  h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin: 24px 0 8px;
+    font-weight: 500;
+  }
+
+  p {
+    margin-bottom: 16px;
+    text-align: justify;
+    hyphens: auto;
+  }
+  p + p { text-indent: 1.4em; }
+  p.noindent + p, h2 + p, h3 + p, h4 + p, blockquote + p, figure + p, .reaction-type + p {
+    text-indent: 0;
+  }
+
+  em { font-style: italic; }
+  strong { font-weight: 600; color: var(--ink); }
+
+  .chem {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92em;
+    padding: 1px 5px;
+    background: rgba(45, 95, 63, 0.08);
+    border-radius: 2px;
+    color: var(--moss-dk);
+    white-space: nowrap;
+  }
+
+  a.ref {
+    color: var(--rust);
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78em;
+    vertical-align: super;
+    line-height: 0;
+    font-weight: 600;
+    padding: 0 2px;
+  }
+  a.ref::before { content: "["; }
+  a.ref::after { content: "]"; }
+  a.ref:hover { background: var(--hi); }
+
+  /* drop cap for intro */
+  section#introduction > p:first-of-type::first-letter {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 68px;
+    float: left;
+    line-height: 0.85;
+    padding: 6px 10px 0 0;
+    color: var(--moss);
+    font-style: normal;
+  }
+
+  /* ===== CALLOUT BOX ===== */
+  .callout {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: var(--paper-dk);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--sepia);
+    position: relative;
+  }
+  .callout .callout-label {
+    position: absolute;
+    top: -8px; left: 16px;
+    background: var(--paper);
+    padding: 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sepia);
+  }
+  .callout p { text-indent: 0; margin-bottom: 8px; font-size: 15.5px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* ===== FIGURE / SVG ===== */
+  figure {
+    margin: 32px 0;
+    padding: 24px;
+    background: #fdfaf2;
+    border: 1px solid var(--rule-soft);
+    border-radius: 3px;
+  }
+  figure svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+  }
+  figcaption {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dotted var(--rule);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-family: 'Source Serif 4', serif;
+    text-align: left;
+  }
+  figcaption b {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+
+  /* ===== REACTION TYPE BLOCKS ===== */
+  .reaction-type {
+    margin: 32px 0;
+    padding: 24px 28px 28px;
+    border: 1px solid var(--rule-soft);
+    background: linear-gradient(to bottom, rgba(253, 250, 242, 0.6), transparent);
+    position: relative;
+    border-radius: 3px;
+  }
+  .reaction-type .rxn-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .reaction-type .rxn-abbr {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--paper);
+    background: var(--moss);
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+  .reaction-type .rxn-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .reaction-type .rxn-tagline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+  }
+  .reaction-type p { text-indent: 0; }
+
+  /* ===== CATALYST GRID ===== */
+  .catalysts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+  .cat-card {
+    padding: 20px;
+    border: 1px solid var(--rule-soft);
+    background: var(--paper-dk);
+    border-radius: 3px;
+    position: relative;
+  }
+  .cat-card h5 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--moss-dk);
+    margin-bottom: 4px;
+  }
+  .cat-card .gen {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .cat-card p { font-size: 14px; text-indent: 0; margin-bottom: 0; text-align: left; }
+  .cat-card .meta-row {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dotted var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+  }
+  .cat-card .meta-row dt { color: var(--sepia); }
+
+  /* ===== APPLICATIONS LIST ===== */
+  .applications {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--rule-soft);
+    border: 1px solid var(--rule-soft);
+    margin: 24px 0;
+  }
+  .app-cell {
+    background: var(--paper);
+    padding: 20px;
+  }
+  .app-cell h5 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .app-cell p { font-size: 14px; text-indent: 0; margin: 0; }
+  .app-cell .example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    margin-top: 8px;
+    display: block;
+  }
+
+  /* ===== BLOCKQUOTE ===== */
+  blockquote {
+    margin: 24px 0;
+    padding: 4px 28px;
+    border-left: 2px solid var(--moss);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  blockquote cite {
+    display: block;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: var(--sepia);
+  }
+  blockquote cite::before { content: "— "; }
+
+  /* ===== REFERENCES ===== */
+  #references ol {
+    list-style: none;
+    counter-reset: ref;
+    padding-left: 0;
+  }
+  #references li {
+    counter-increment: ref;
+    position: relative;
+    padding: 12px 0 12px 40px;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 14.5px;
+    line-height: 1.5;
+    scroll-margin-top: 20px;
+  }
+  #references li::before {
+    content: "(" counter(ref) ")";
+    position: absolute;
+    left: 0; top: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--rust);
+    font-weight: 600;
+  }
+  #references li:target {
+    background: var(--hi);
+    padding-left: 48px;
+  }
+  #references em { font-style: italic; color: var(--moss-dk); }
+  #references strong { font-weight: 600; }
+
+  /* ===== FOOTER ===== */
+  footer.colophon {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer a {
+    color: var(--moss);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  footer a:hover { border-bottom-color: var(--moss); }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .nobel { break-inside: avoid; }
+    figure, .reaction-type, .callout { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="eyebrow">Chemistry Monograph · Organic Reactions</div>
+    <h1 class="title">Olefin <em>Metathesis</em></h1>
+    <p class="lede">The reshuffling of carbon–carbon double bonds — a reaction once called "the Changing Partners dance" — and the catalysts that made it one of the most consequential transformations of modern synthetic chemistry.</p>
+
+    <div class="meta">
+      <span><strong>Reaction class</strong> · Transition-metal catalyzed</span>
+      <span><strong>Mechanism</strong> · Chauvin (metallacyclobutane)</span>
+      <span><strong>Nobel</strong> · Chemistry 2005</span>
+    </div>
+
+    <div class="nobel">
+      <div class="medal">N</div>
+      <div>
+        The 2005 Nobel Prize in Chemistry was awarded jointly to <strong>Yves Chauvin</strong>, <strong>Robert H. Grubbs</strong>, and <strong>Richard R. Schrock</strong> "for the development of the metathesis method in organic synthesis."<a href="#ref1" class="ref">1</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc" aria-label="Contents">
+    <h6>Contents</h6>
+    <ol>
+      <li><a href="#introduction">Introduction</a></li>
+      <li><a href="#history">Historical Development</a></li>
+      <li><a href="#mechanism">The Chauvin Mechanism</a></li>
+      <li><a href="#catalysts">Catalysts</a></li>
+      <li><a href="#reactions">Reaction Types</a></li>
+      <li><a href="#selectivity">Selectivity &amp; Thermodynamics</a></li>
+      <li><a href="#applications">Applications</a></li>
+      <li><a href="#references">References</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. INTRODUCTION -->
+  <section id="introduction">
+    <h2 data-num="§ I">Introduction</h2>
+    <span class="kicker">Definition &amp; scope</span>
+
+    <p class="noindent">Olefin metathesis is a catalytic reaction in which two alkenes exchange the substituents attached to their carbon–carbon double bonds. In its most general representation, two <span class="chem">R¹HC=CHR²</span> and <span class="chem">R³HC=CHR⁴</span> substrates are converted into <span class="chem">R¹HC=CHR³</span> and <span class="chem">R²HC=CHR⁴</span> (plus the statistical mix of other combinations). The reaction is mediated by a transition-metal alkylidene — a compound in which a metal center is doubly bonded to a carbon atom — and it proceeds through a strained four-membered metallacyclobutane intermediate.<a href="#ref2" class="ref">2</a></p>
+
+    <p>Because the C=C bond is a structural element of enormous generality — it appears in pharmaceuticals, polymers, fragrances, natural products, and commodity petrochemicals — a reaction that rearranges it with broad tolerance for other functional groups has applications across nearly all of synthetic chemistry. Metathesis does exactly this. It is reversible, typically run near equilibrium, and driven forward either by release of a volatile byproduct (most often ethylene) or by relief of ring strain.</p>
+
+    <div class="callout">
+      <span class="callout-label">Etymology</span>
+      <p>The term <em>metathesis</em> comes from the Greek μετάθεσις ("transposition"), describing the exchange of bonded partners. In grammar, it denotes the rearrangement of sounds within a word; in chemistry, it denotes the rearrangement of atoms across two molecules.</p>
+    </div>
+
+    <p>This monograph treats the four principal modes of olefin metathesis — cross metathesis (<strong>CM</strong>), ring-closing metathesis (<strong>RCM</strong>), ring-opening metathesis (<strong>ROM</strong>), and ring-opening metathesis polymerization (<strong>ROMP</strong>) — along with two important variants (<strong>ADMET</strong> and <strong>enyne metathesis</strong>). For each, the driving force, typical catalyst, and selectivity considerations are discussed.</p>
+  </section>
+
+  <!-- 2. HISTORY -->
+  <section id="history">
+    <h2 data-num="§ II">Historical Development</h2>
+    <span class="kicker">From mystery reaction to mechanism</span>
+
+    <p class="noindent">The phenomenon predates the name. In the 1950s, chemists at DuPont, Phillips Petroleum, and Standard Oil observed that certain heterogeneous catalysts could convert propylene into a mixture of ethylene and 2-butenes. No one knew what was happening. The transformation was formally a "disproportionation," and it was initially interpreted through the lens of then-familiar radical or ionic mechanisms, none of which fit the experimental facts.<a href="#ref3" class="ref">3</a></p>
+
+    <p>In 1971, Yves Chauvin and his student Jean-Louis Hérisson, working at the Institut Français du Pétrole, proposed the correct mechanism: a catalytic cycle involving a metal carbene (alkylidene) that reacts with an alkene to form a metallacyclobutane, which then cleaves in the opposite sense to regenerate a new metal carbene and release a new alkene.<a href="#ref4" class="ref">4</a> The proposal was elegant, but heterodox — no well-defined metal alkylidene was known to catalyze the reaction at the time.</p>
+
+    <p>The validation of Chauvin's mechanism required the discovery of well-defined, isolable catalysts that behaved as the mechanism predicted. Richard Schrock at MIT developed the first of these: highly active molybdenum and tungsten alkylidene complexes that were sensitive to moisture and oxygen but extraordinarily effective.<a href="#ref5" class="ref">5</a> Robert Grubbs at Caltech then developed a family of ruthenium-based catalysts — less active than Schrock's, but much more tolerant of functional groups, moisture, and air.<a href="#ref6" class="ref">6</a> The Grubbs catalysts transformed metathesis from a specialist tool into a reaction any synthetic chemist could run on the benchtop.</p>
+
+    <blockquote>
+      The 2005 Prize was about finding something useful: a catalyst that works for almost any alkene, in almost any solvent, in the presence of almost any functional group.
+      <cite>paraphrased, Royal Swedish Academy press release, 2005</cite>
+    </blockquote>
+  </section>
+
+  <!-- 3. MECHANISM -->
+  <section id="mechanism">
+    <h2 data-num="§ III">The Chauvin Mechanism</h2>
+    <span class="kicker">Catalytic cycle via metallacyclobutane</span>
+
+    <p class="noindent">Chauvin's mechanism is a four-step catalytic cycle. A metal alkylidene <span class="chem">[M]=CHR</span> binds an incoming alkene, undergoes a formal [2+2] cycloaddition to give a metallacyclobutane, and then fragments in the reverse (retro-[2+2]) sense to release a new alkene and a new metal alkylidene. The catalyst identity is preserved through the cycle, but the alkylidene substituent exchanges with each turnover.</p>
+
+    <figure>
+      <svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chauvin mechanism">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#b8543d"/>
+          </marker>
+          <style>
+            .bond { stroke: #1a2433; stroke-width: 1.6; fill: none; }
+            .dbond { stroke: #1a2433; stroke-width: 1.6; fill: none; }
+            .atom { font-family: 'JetBrains Mono', monospace; font-size: 13px; fill: #1a2433; font-weight: 600; }
+            .metal { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: #2d5f3f; font-weight: 700; }
+            .arrow { stroke: #b8543d; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+            .label { font-family: 'Source Serif 4', serif; font-size: 11px; fill: #3a4657; font-style: italic; }
+            .step { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #b8543d; font-weight: 600; letter-spacing: 0.1em; }
+          </style>
+        </defs>
+
+        <!-- STEP 1: alkylidene + alkene -->
+        <g transform="translate(30,60)">
+          <text class="step" x="50" y="-10">① COORDINATION</text>
+          <!-- Metal alkylidene M=CHR -->
+          <text class="metal" x="0" y="45">[M]</text>
+          <line class="dbond" x1="30" y1="40" x2="70" y2="40"/>
+          <line class="dbond" x1="30" y1="46" x2="70" y2="46"/>
+          <text class="atom" x="75" y="45">CHR¹</text>
+          <!-- Alkene R²HC=CHR³ -->
+          <text class="atom" x="50" y="100">R²HC</text>
+          <line class="dbond" x1="87" y1="94" x2="120" y2="94"/>
+          <line class="dbond" x1="87" y1="100" x2="120" y2="100"/>
+          <text class="atom" x="125" y="100">CHR³</text>
+        </g>
+
+        <!-- arrow 1 -->
+        <path class="arrow" d="M 200 100 Q 245 100 290 100"/>
+        <text class="label" x="215" y="92">[2+2]</text>
+
+        <!-- STEP 2: metallacyclobutane -->
+        <g transform="translate(310,60)">
+          <text class="step" x="25" y="-10">② METALLACYCLOBUTANE</text>
+          <!-- Square: M - C - C - C back to M -->
+          <text class="metal" x="25" y="55">[M]</text>
+          <text class="atom" x="115" y="55">CHR¹</text>
+          <text class="atom" x="25" y="115">CHR²</text>
+          <text class="atom" x="115" y="115">CHR³</text>
+          <line class="bond" x1="55" y1="50" x2="110" y2="50"/>
+          <line class="bond" x1="120" y1="60" x2="120" y2="95"/>
+          <line class="bond" x1="55" y1="110" x2="110" y2="110"/>
+          <line class="bond" x1="35" y1="60" x2="35" y2="95"/>
+        </g>
+
+        <!-- arrow 2 -->
+        <path class="arrow" d="M 490 100 Q 540 100 585 100"/>
+        <text class="label" x="505" y="92">retro-[2+2]</text>
+
+        <!-- STEP 3: products -->
+        <g transform="translate(600,60)">
+          <text class="step" x="20" y="-10">③ PRODUCTS</text>
+          <!-- New alkylidene M=CHR² -->
+          <text class="metal" x="-10" y="45">[M]</text>
+          <line class="dbond" x1="20" y1="40" x2="55" y2="40"/>
+          <line class="dbond" x1="20" y1="46" x2="55" y2="46"/>
+          <text class="atom" x="60" y="45">CHR²</text>
+          <!-- New alkene R¹HC=CHR³ -->
+          <text class="atom" x="-10" y="100">R¹HC</text>
+          <line class="dbond" x1="27" y1="94" x2="60" y2="94"/>
+          <line class="dbond" x1="27" y1="100" x2="60" y2="100"/>
+          <text class="atom" x="65" y="100">CHR³</text>
+        </g>
+
+        <!-- cycle arrow back -->
+        <path class="arrow" d="M 670 180 Q 670 300 400 300 Q 100 300 60 230 Q 40 200 60 180" stroke-dasharray="4 4"/>
+        <text class="label" x="320" y="326" text-anchor="middle">catalyst re-enters with a new alkene substrate</text>
+
+        <!-- overall arrow / equilibrium marker -->
+        <g transform="translate(0,340)">
+          <text class="label" x="360" y="0" text-anchor="middle" style="font-size: 12px;">all steps are reversible · net reaction is driven by ethylene release or ring-strain relief</text>
+        </g>
+      </svg>
+      <figcaption><b>Figure 1.</b> The Chauvin catalytic cycle. A transition-metal alkylidene <span class="chem">[M]=CHR¹</span> and an alkene undergo [2+2] cycloaddition to form a metallacyclobutane, which fragments in the productive sense to give a new alkylidene <span class="chem">[M]=CHR²</span> and a new alkene. Every elementary step is reversible; the cycle as drawn represents one productive turnover.</figcaption>
+    </figure>
+
+    <h4>Productive vs. Non-productive Cycles</h4>
+    <p class="noindent">The metallacyclobutane can fragment in two ways: along the "original" diagonal (regenerating the starting materials — a <em>degenerate</em> or <em>non-productive</em> cycle) or along the other diagonal (generating the product — a <em>productive</em> cycle). For disubstituted metallacyclobutanes, both outcomes are possible, and the ratio depends on the steric and electronic environment at the metal. This is why metathesis is intrinsically reversible: every productive turnover is matched by an unproductive (or reverse-productive) alternative.</p>
+
+    <h4>The Dissociative Pathway (Grubbs Catalysts)</h4>
+    <p class="noindent">For Grubbs-type ruthenium catalysts, the resting state is a 16-electron complex of the form <span class="chem">(L)(PCy₃)Cl₂Ru=CHPh</span>. Before metathesis can occur, a phosphine (or, for second-generation catalysts, the NHC partner) must dissociate to generate the active 14-electron species. Substrate alkene then binds in the vacated coordination site, and the [2+2]/retro-[2+2] cycle proceeds. The rate of phosphine dissociation is therefore rate-determining for most Grubbs-catalyzed metathesis.<a href="#ref7" class="ref">7</a></p>
+  </section>
+
+  <!-- 4. CATALYSTS -->
+  <section id="catalysts">
+    <h2 data-num="§ IV">Catalysts</h2>
+    <span class="kicker">Schrock, Grubbs, Hoveyda</span>
+
+    <p class="noindent">Modern metathesis practice is defined by a small set of well-characterized catalysts. They differ primarily in the metal (Mo, W, or Ru), the supporting ligands (alkoxides, imido, phosphines, N-heterocyclic carbenes), and the identity of the initiating alkylidene. Each offers a different balance of activity, functional-group tolerance, and stereoselectivity.</p>
+
+    <div class="catalysts">
+      <div class="cat-card">
+        <h5>Schrock Mo/W catalysts</h5>
+        <div class="gen">Mo imido alkoxide · 1990</div>
+        <p>Extremely active — often the only catalysts capable of metathesizing tri- and tetrasubstituted alkenes. Intolerant of protic and polar functional groups, moisture, and air. Typically prepared and handled in a glovebox.</p>
+        <dl class="meta-row">
+          <dt>Formula</dt><dd>Mo(NAr)(CHR)(OR')₂</dd>
+          <dt>Strength</dt><dd>Activity, sterically hindered substrates</dd>
+          <dt>Weakness</dt><dd>FG tolerance, air/water sensitivity</dd>
+        </dl>
+      </div>
+
+      <div class="cat-card">
+        <h5>Grubbs 1st Generation</h5>
+        <div class="gen">Ru alkylidene · 1995</div>
+        <p>The first Ru catalyst to combine useful activity with benchtop handling. Tolerant of alcohols, aldehydes, amides, and even aqueous conditions. Works well for unhindered olefins; struggles with tri- and tetrasubstituted substrates.</p>
+        <dl class="meta-row">
+          <dt>Formula</dt><dd>RuCl₂(=CHPh)(PCy₃)₂</dd>
+          <dt>Strength</dt><dd>FG tolerance, bench stability</dd>
+          <dt>Weakness</dt><dd>Lower activity on hindered substrates</dd>
+        </dl>
+      </div>
+
+      <div class="cat-card">
+        <h5>Grubbs 2nd Generation</h5>
+        <div class="gen">Ru / NHC · 1999</div>
+        <p>One phosphine of Grubbs I is replaced by an N-heterocyclic carbene (1,3-dimesityl-4,5-dihydroimidazol-2-ylidene, H₂IMes). Dramatically increased activity while retaining functional-group tolerance. The workhorse catalyst for most modern metathesis.</p>
+        <dl class="meta-row">
+          <dt>Formula</dt><dd>RuCl₂(=CHPh)(H₂IMes)(PCy₃)</dd>
+          <dt>Strength</dt><dd>Activity + FG tolerance</dd>
+          <dt>Weakness</dt><dd>Slower initiation than G1</dd>
+        </dl>
+      </div>
+
+      <div class="cat-card">
+        <h5>Hoveyda–Grubbs 2nd Gen</h5>
+        <div class="gen">Ru / NHC / chelating styrenyl ether · 2000</div>
+        <p>Phosphine is replaced by a chelating ortho-isopropoxybenzylidene. Phosphine-free, so insensitive to phosphine scavengers. Recyclable and unusually robust; particularly good for electron-poor alkenes.</p>
+        <dl class="meta-row">
+          <dt>Formula</dt><dd>RuCl₂(=CH-o-iPrO-C₆H₄)(H₂IMes)</dd>
+          <dt>Strength</dt><dd>Stability, recyclable, deactivated substrates</dd>
+          <dt>Weakness</dt><dd>Slower initiation than Grubbs II</dd>
+        </dl>
+      </div>
+
+      <div class="cat-card">
+        <h5>Grubbs 3rd Generation</h5>
+        <div class="gen">Ru / NHC / pyridines · 2002</div>
+        <p>Pyridine ligands labile; phosphine replaced by two 3-bromopyridines. Fast initiation, which makes it the standard choice for ROMP, where initiation rate controls polymer dispersity (Đ).</p>
+        <dl class="meta-row">
+          <dt>Formula</dt><dd>RuCl₂(=CHPh)(H₂IMes)(3-Br-py)₂</dd>
+          <dt>Strength</dt><dd>Fast initiation — ideal for ROMP</dd>
+          <dt>Weakness</dt><dd>Less stable than G2/HG2</dd>
+        </dl>
+      </div>
+    </div>
+
+    <p>A loose rule of thumb: Schrock catalysts for the hardest substrates (under inert atmosphere); Grubbs II or Hoveyda–Grubbs II for nearly everything else; Grubbs III when initiation speed matters. For comprehensive discussions of catalyst design and choice, see the two-volume <em>Handbook of Metathesis</em>.<a href="#ref8" class="ref">8</a></p>
+  </section>
+
+  <!-- 5. REACTIONS -->
+  <section id="reactions">
+    <h2 data-num="§ V">Reaction Types</h2>
+    <span class="kicker">CM · RCM · ROM · ROMP · ADMET · Enyne</span>
+
+    <p class="noindent">Metathesis is classified by the topology of the substrate(s) and the product(s). Six modes account for the vast majority of applications.</p>
+
+    <!-- CM -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">CM</span>
+        <span class="rxn-name">Cross Metathesis</span>
+      </div>
+      <div class="rxn-tagline">two acyclic alkenes → two new acyclic alkenes</div>
+      <p>Two acyclic alkenes are combined to give a new acyclic alkene (plus, typically, ethylene as the byproduct if terminal alkenes are used). CM is the simplest metathesis transformation in principle but the most selectivity-sensitive in practice — a mixture of A+B substrates can give AA, AB, and BB products statistically unless one or both partners is "typed" for selective cross-coupling. Grubbs introduced a four-category classification of alkenes (Types I–IV) based on how readily they homodimerize, which remains the standard framework for predicting CM outcomes.<a href="#ref9" class="ref">9</a></p>
+    </div>
+
+    <!-- RCM -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">RCM</span>
+        <span class="rxn-name">Ring-Closing Metathesis</span>
+      </div>
+      <div class="rxn-tagline">α,ω-diene → cycloalkene + ethylene</div>
+      <p>An acyclic α,ω-diene undergoes intramolecular metathesis to give a cyclic alkene, extruding ethylene. RCM is the most synthetically prized of all metathesis modes — it constructs rings of almost any size (5-, 6-, 7-membered are routine; macrocycles are common) under mild conditions, with broad functional-group tolerance. It is now a standard disconnection for macrocyclic drug candidates.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 140" xmlns="http://www.w3.org/2000/svg">
+          <style>
+            .line { stroke: #1a2433; stroke-width: 1.6; fill: none; }
+            .dline { stroke: #1a2433; stroke-width: 1.6; fill: none; }
+            .ar { stroke: #b8543d; stroke-width: 1.4; fill: none; marker-end: url(#arr2); }
+            .lb { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; fill: #3a4657; }
+            .atom2 { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #1a2433; font-weight: 500; }
+          </style>
+          <defs>
+            <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#b8543d"/>
+            </marker>
+          </defs>
+          <!-- diene chain CH2=CH-(CH2)4-CH=CH2 -->
+          <g transform="translate(20,55)">
+            <text class="atom2" x="0" y="5">H₂C</text>
+            <line class="dline" x1="26" y1="-2" x2="54" y2="-2"/>
+            <line class="dline" x1="26" y1="4" x2="54" y2="4"/>
+            <text class="atom2" x="58" y="5">HC</text>
+            <line class="line" x1="82" y1="0" x2="105" y2="15"/>
+            <line class="line" x1="105" y1="15" x2="128" y2="0"/>
+            <line class="line" x1="128" y1="0" x2="150" y2="15"/>
+            <line class="line" x1="150" y1="15" x2="172" y2="0"/>
+            <text class="atom2" x="178" y="5">CH</text>
+            <line class="dline" x1="200" y1="-2" x2="228" y2="-2"/>
+            <line class="dline" x1="200" y1="4" x2="228" y2="4"/>
+            <text class="atom2" x="232" y="5">CH₂</text>
+          </g>
+
+          <!-- arrow -->
+          <path class="ar" d="M 300 70 L 380 70"/>
+          <text class="lb" x="340" y="60" text-anchor="middle">cat.</text>
+          <text class="lb" x="340" y="85" text-anchor="middle">Grubbs II</text>
+
+          <!-- cyclohexene -->
+          <g transform="translate(420,40)">
+            <polygon class="line" points="30,0 60,0 75,26 60,52 30,52 15,26" stroke="#1a2433" fill="none"/>
+            <!-- double bond (top) -->
+            <line class="dline" x1="33" y1="-4" x2="57" y2="-4"/>
+          </g>
+          <text class="atom2" x="540" y="70">+   H₂C=CH₂</text>
+          <text class="lb" x="540" y="105">(ethylene, volatile)</text>
+        </svg>
+        <figcaption><b>Figure 2.</b> A textbook RCM: 1,7-octadiene closes to cyclohexene under Grubbs II catalysis with loss of ethylene. Ethylene escapes the reaction mixture, shifting the equilibrium toward the ring.</figcaption>
+      </figure>
+    </div>
+
+    <!-- ROM -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">ROM</span>
+        <span class="rxn-name">Ring-Opening Metathesis</span>
+      </div>
+      <div class="rxn-tagline">strained cycloalkene + alkene → acyclic diene</div>
+      <p>A strained cyclic alkene (typically norbornene or cyclobutene) is opened by a second alkene to give an acyclic product containing both new alkene units. ROM is the single-turnover cousin of ROMP: if the ring-opened alkylidene is terminated before it can react with another cyclic monomer, the isolated product is a discrete molecule rather than a polymer. Driven by release of ~27 kcal mol⁻¹ of strain for norbornene.</p>
+    </div>
+
+    <!-- ROMP -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">ROMP</span>
+        <span class="rxn-name">Ring-Opening Metathesis Polymerization</span>
+      </div>
+      <div class="rxn-tagline">strained cycloalkene → polymer with one alkene per repeat unit</div>
+      <p>When a strained cyclic alkene reacts with a metal alkylidene, the resulting ring-opened alkylidene can react with another monomer, then another, and so on — each turnover adding one monomer to a growing chain. The product is a polymer containing exactly one C=C double bond per repeat unit. ROMP is the method of choice for well-defined polynorbornenes, polycyclooctenes (→ polyoctenamer rubber, marketed as Vestenamer), and numerous dicyclopentadiene-based thermosets (e.g., reaction injection molded parts). Living ROMP with Grubbs III gives polymers with narrow molecular-weight distributions (Đ ≈ 1.05) and enables precise block copolymer synthesis.<a href="#ref10" class="ref">10</a></p>
+    </div>
+
+    <!-- ADMET -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">ADMET</span>
+        <span class="rxn-name">Acyclic Diene Metathesis Polymerization</span>
+      </div>
+      <div class="rxn-tagline">α,ω-diene monomers → unsaturated polymer + ethylene</div>
+      <p>An α,ω-diene can either close (RCM) or polymerize head-to-tail (ADMET). Which one wins depends on concentration, ring size accessibility, and catalyst: dilute conditions favor RCM; bulk or concentrated conditions favor ADMET. The reaction is a step-growth polymerization driven by ethylene loss, and it produces strictly linear polymers with one internal alkene per repeat unit.</p>
+    </div>
+
+    <!-- Enyne -->
+    <div class="reaction-type">
+      <div class="rxn-header">
+        <span class="rxn-abbr">Enyne</span>
+        <span class="rxn-name">Enyne Metathesis</span>
+      </div>
+      <div class="rxn-tagline">alkene + alkyne → 1,3-diene</div>
+      <p>An alkene and an alkyne combine to give a 1,3-diene. Unlike the other metathesis modes, enyne metathesis is atom-economical — no small-molecule byproduct is released, because the alkyne supplies two carbons that are incorporated into the diene. The mechanism involves a vinyl carbene intermediate; the intramolecular version (ring-closing enyne metathesis, RCEYM) is a particularly powerful way to construct cyclic 1,3-dienes that can be elaborated by Diels–Alder chemistry.<a href="#ref11" class="ref">11</a></p>
+    </div>
+  </section>
+
+  <!-- 6. SELECTIVITY -->
+  <section id="selectivity">
+    <h2 data-num="§ VI">Selectivity &amp; Thermodynamics</h2>
+    <span class="kicker">E/Z ratios, equilibrium, driving force</span>
+
+    <p class="noindent">Because every step in the Chauvin cycle is reversible, metathesis reactions reach a thermodynamic mixture unless something is done to push them forward. Four strategies are commonly used:</p>
+
+    <h4>1. Ethylene extrusion</h4>
+    <p class="noindent">For reactions that produce ethylene (CM of terminal alkenes, RCM, ADMET), running open to the atmosphere or under partial vacuum removes ethylene and shifts the equilibrium toward products. For RCM of macrocycles, sparging with nitrogen or argon is standard.</p>
+
+    <h4>2. Ring strain release</h4>
+    <p class="noindent">For ROM and ROMP, the driving force is relief of ring strain in the cyclic substrate. Norbornene (≈ 27 kcal mol⁻¹ strain) and cyclobutene (≈ 30 kcal mol⁻¹) are excellent ROMP monomers; cyclopentene (~ 6 kcal mol⁻¹) polymerizes only under high monomer concentrations; cyclohexene does not ROMP at all — it is unstrained, and its polymer, polybutadienylene, is higher in energy than the monomer.</p>
+
+    <h4>3. Precipitation</h4>
+    <p>For polymerizations, precipitation of the insoluble polymer product removes it from equilibrium and drives the reaction.</p>
+
+    <h4>4. Stereoselective catalyst design</h4>
+    <p class="noindent">With most Ru catalysts, the thermodynamic E:Z ratio in internal alkenes is typically 3:1 to 5:1 in favor of E (trans). Achieving selectivity for the Z (cis) isomer requires specially designed catalysts. Schrock, Hoveyda, and Grubbs have each developed Z-selective catalyst families; these are now mature enough for use in the synthesis of cis-double-bond-containing natural products such as prostaglandins and insect pheromones.<a href="#ref12" class="ref">12</a></p>
+
+    <div class="callout">
+      <span class="callout-label">Caveat</span>
+      <p>Chemoselectivity depends strongly on catalyst identity. Grubbs I tolerates alcohols, aldehydes, amides, carboxylic acids, and water; it does not tolerate free amines, thiols, or phosphines (all of which coordinate ruthenium). Grubbs II extends the tolerance to many electron-poor alkenes (e.g., acrylates). Schrock catalysts tolerate none of these in any useful way.</p>
+    </div>
+  </section>
+
+  <!-- 7. APPLICATIONS -->
+  <section id="applications">
+    <h2 data-num="§ VII">Applications</h2>
+    <span class="kicker">Medicine, polymers, commodity chemicals</span>
+
+    <p class="noindent">Metathesis has moved from curiosity to indispensable tool across scales, from laboratory total synthesis to multi-kiloton industrial polymer production.</p>
+
+    <div class="applications">
+      <div class="app-cell">
+        <h5>Pharmaceutical synthesis</h5>
+        <p>RCM is routine for constructing macrocycles and medium-ring heterocycles in drug candidates.</p>
+        <span class="example">e.g. simeprevir, vaniprevir (HCV NS3/4A inhibitors)</span>
+      </div>
+      <div class="app-cell">
+        <h5>Polymer manufacturing</h5>
+        <p>ROMP produces commodity and specialty polymers with exactly one C=C per repeat unit.</p>
+        <span class="example">e.g. Norsorex, Vestenamer, DCPD thermosets</span>
+      </div>
+      <div class="app-cell">
+        <h5>Petrochemicals</h5>
+        <p>Shell's SHOP process and OCT (olefin conversion technology) produce linear α-olefins at megaton scale via metathesis.</p>
+        <span class="example">e.g. propylene from ethylene + 2-butene</span>
+      </div>
+      <div class="app-cell">
+        <h5>Natural product synthesis</h5>
+        <p>Macrolides, cyclopeptides, and terpenoid skeletons — many built by RCM in their disconnection.</p>
+        <span class="example">e.g. epothilones, platensimycin, coibacin A</span>
+      </div>
+      <div class="app-cell">
+        <h5>Oleochemistry / biodiesel</h5>
+        <p>Cross metathesis of methyl oleate with ethylene produces 1-decene and methyl 9-decenoate — renewable α-olefins from seed oils.</p>
+        <span class="example">e.g. Elevance Renewable Sciences process</span>
+      </div>
+      <div class="app-cell">
+        <h5>Materials / surfaces</h5>
+        <p>Surface-initiated ROMP decorates surfaces with polymer brushes of controlled thickness and composition.</p>
+        <span class="example">e.g. antifouling coatings, sensor interfaces</span>
+      </div>
+    </div>
+
+    <p>The breadth of application reflects the unusual fit of metathesis to modern synthesis: high selectivity for C=C in the presence of heteroatoms; mild conditions (often room temperature); tolerance of water and air for Ru catalysts; scalability from milligram to metric-ton; and an intuitive, retrosynthetically useful disconnection (every internal alkene becomes a potential metathesis disconnection).</p>
+  </section>
+
+  <!-- 8. REFERENCES -->
+  <section id="references">
+    <h2 data-num="§ VIII">References</h2>
+    <span class="kicker">ACS citation format</span>
+
+    <ol>
+      <li id="ref1">
+        The Royal Swedish Academy of Sciences. The Nobel Prize in Chemistry 2005 — Advanced Information. <em>Nobelprize.org</em>, 2005. https://www.nobelprize.org/prizes/chemistry/2005/advanced-information (accessed 2026-04-20).
+      </li>
+      <li id="ref2">
+        Grubbs, R. H.; Chang, S. Recent Advances in Olefin Metathesis and Its Application in Organic Synthesis. <em>Tetrahedron</em> <strong>1998</strong>, <em>54</em> (18), 4413–4450. https://doi.org/10.1016/S0040-4020(97)10427-6.
+      </li>
+      <li id="ref3">
+        Banks, R. L.; Bailey, G. C. Olefin Disproportionation: A New Catalytic Process. <em>Ind. Eng. Chem. Prod. Res. Dev.</em> <strong>1964</strong>, <em>3</em> (3), 170–173. https://doi.org/10.1021/i360011a002.
+      </li>
+      <li id="ref4">
+        Hérisson, J.-L.; Chauvin, Y. Catalyse de transformation des oléfines par les complexes du tungstène. II. Télomérisation des oléfines cycliques en présence d'oléfines acycliques. <em>Makromol. Chem.</em> <strong>1971</strong>, <em>141</em> (1), 161–176. https://doi.org/10.1002/macp.1971.021410112.
+      </li>
+      <li id="ref5">
+        Schrock, R. R.; Murdzek, J. S.; Bazan, G. C.; Robbins, J.; DiMare, M.; O'Regan, M. Synthesis of Molybdenum Imido Alkylidene Complexes and Some Reactions Involving Acyclic Olefins. <em>J. Am. Chem. Soc.</em> <strong>1990</strong>, <em>112</em> (10), 3875–3886. https://doi.org/10.1021/ja00166a023.
+      </li>
+      <li id="ref6">
+        Schwab, P.; Grubbs, R. H.; Ziller, J. W. Synthesis and Applications of RuCl₂(=CHR')(PR₃)₂: The Influence of the Alkylidene Moiety on Metathesis Activity. <em>J. Am. Chem. Soc.</em> <strong>1996</strong>, <em>118</em> (1), 100–110. https://doi.org/10.1021/ja952676d.
+      </li>
+      <li id="ref7">
+        Sanford, M. S.; Love, J. A.; Grubbs, R. H. Mechanism and Activity of Ruthenium Olefin Metathesis Catalysts. <em>J. Am. Chem. Soc.</em> <strong>2001</strong>, <em>123</em> (27), 6543–6554. https://doi.org/10.1021/ja010624k.
+      </li>
+      <li id="ref8">
+        Grubbs, R. H.; Wenzel, A. G.; O'Leary, D. J.; Khosravi, E., Eds. <em>Handbook of Metathesis</em>, 2nd ed.; Wiley-VCH: Weinheim, Germany, 2015; Vols. 1–3.
+      </li>
+      <li id="ref9">
+        Chatterjee, A. K.; Choi, T.-L.; Sanders, D. P.; Grubbs, R. H. A General Model for Selectivity in Olefin Cross Metathesis. <em>J. Am. Chem. Soc.</em> <strong>2003</strong>, <em>125</em> (37), 11360–11370. https://doi.org/10.1021/ja0214882.
+      </li>
+      <li id="ref10">
+        Bielawski, C. W.; Grubbs, R. H. Living Ring-Opening Metathesis Polymerization. <em>Prog. Polym. Sci.</em> <strong>2007</strong>, <em>32</em> (1), 1–29. https://doi.org/10.1016/j.progpolymsci.2006.08.006.
+      </li>
+      <li id="ref11">
+        Diver, S. T.; Giessert, A. J. Enyne Metathesis (Enyne Bond Reorganization). <em>Chem. Rev.</em> <strong>2004</strong>, <em>104</em> (3), 1317–1382. https://doi.org/10.1021/cr020009e.
+      </li>
+      <li id="ref12">
+        Keitz, B. K.; Endo, K.; Patel, P. R.; Herbert, M. B.; Grubbs, R. H. Improved Ruthenium Catalysts for Z-Selective Olefin Metathesis. <em>J. Am. Chem. Soc.</em> <strong>2012</strong>, <em>134</em> (1), 693–699. https://doi.org/10.1021/ja210225e.
+      </li>
+    </ol>
+  </section>
+
+  <footer class="colophon">
+    <span>SSA · CH410 · Reference monograph</span>
+    <span><a href="simulator.html">→ Go to interactive simulator</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
