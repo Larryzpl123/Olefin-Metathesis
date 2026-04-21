@@ -11,7 +11,7 @@
       box-sizing: border-box;
     }
     body {
-      background: #f4f7fb;
+      background: #f0f4f8;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.5;
       padding: 2rem 1rem;
@@ -21,29 +21,22 @@
       justify-content: center;
     }
     .hub {
-      max-width: 620px;
+      max-width: 680px;
       width: 100%;
-      background: white;
+      background: #ffffff;
       border-radius: 28px;
-      box-shadow: 0 20px 35px -8px rgba(0, 20, 30, 0.12), 0 6px 10px -4px rgba(0,0,0,0.02);
+      box-shadow: 0 18px 30px -8px rgba(0, 20, 30, 0.1), 0 6px 10px -4px rgba(0,0,0,0.02);
       padding: 2.2rem 2.2rem 2rem;
-      border: 1px solid #e2eaf1;
+      border: 1px solid #dde6ed;
     }
     h1 {
       font-weight: 550;
-      font-size: 2rem;
+      font-size: 1.9rem;
       letter-spacing: -0.02em;
-      color: #173e4c;
-      border-bottom: 2px solid #cbdde6;
+      color: #1a4457;
+      border-bottom: 2px solid #c5d9e8;
       padding-bottom: 0.5rem;
       margin-bottom: 1.8rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    h1::before {
-      content: "⚛️";
-      font-size: 1.8rem;
     }
     .link-tree {
       list-style: none;
@@ -51,20 +44,19 @@
       padding: 0;
     }
     .link-tree li {
-      margin: 0.5rem 0;
+      margin: 0.55rem 0;
       padding-left: 0.2rem;
     }
-    /* nested indentation – each dash = one indent level */
     .link-tree ul {
       list-style: none;
-      margin-left: 2.2rem;      /* visual indent */
+      margin-left: 2.4rem;
       padding-left: 0.8rem;
-      border-left: 2px dashed #b0cadb;
+      border-left: 2px dashed #b3cadc;
       margin-top: 0.3rem;
       margin-bottom: 0.3rem;
     }
     .link-tree a {
-      color: #1b5f7a;
+      color: #1a627a;
       text-decoration: none;
       font-weight: 480;
       border-bottom: 1px dotted transparent;
@@ -73,34 +65,39 @@
       padding: 0.1rem 0;
     }
     .link-tree a:hover {
-      color: #0a3342;
-      border-bottom: 1px dotted #1b5f7a;
+      color: #093a4d;
+      border-bottom: 1px dotted #1a627a;
     }
-    /* PDF icon for the specific link */
-    a[href$=".pdf"]::before {
-      content: "📄 ";
-      font-size: 0.95em;
-      opacity: 0.85;
+    .youtube-note {
+      margin-top: 1.8rem;
+      font-style: italic;
+      color: #2c5b70;
+      background: #eef3f9;
+      padding: 0.7rem 1.2rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 0.95rem;
+      border-left: 4px solid #1a627a;
+      line-height: 1.5;
     }
-    .meta-note {
-      margin-top: 2.2rem;
-      font-size: 0.8rem;
-      color: #5e7a8a;
+    .youtube-note a {
+      color: #1a627a;
+      text-decoration: none;
+      font-weight: 500;
+      font-style: normal;
+      border-bottom: 1px dotted #1a627a;
+    }
+    .youtube-note a:hover {
+      color: #073042;
+      border-bottom: 1px solid #073042;
+    }
+    .meta-footer {
+      margin-top: 1.8rem;
+      font-size: 0.75rem;
+      color: #5f7e90;
       border-top: 1px solid #dee8f0;
       padding-top: 1.2rem;
       text-align: right;
-      font-weight: 400;
-    }
-    .badge {
-      background: #e4eef6;
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-      margin-left: 10px;
-      color: #1e4b60;
-    }
-    /* keep spacing consistent */
-    .link-tree li li {
-      margin: 0.35rem 0;
     }
   </style>
 </head>
@@ -109,18 +106,17 @@
   <h1>Olefin Metathesis · Hub</h1>
 
   <ul class="link-tree">
-    <!-- Primary entries -->
     <li>
-      <a href="http://larryzpl123.github.io/Olefin-Metathesis/info.html">🧪 What is Olefin Metathesis</a>
+      <a href="https://larryzpl123.github.io/Olefin-Metathesis/video.mp4">Olefin Metathesis Video</a>
     </li>
     <li>
-      <a href="http://larryzpl123.github.io/Olefin-Metathesis/simulator.html">⚙️ Olefin Metathesis Simulator</a>
+      <a href="http://larryzpl123.github.io/Olefin-Metathesis/info.html">What is Olefin Metathesis</a>
     </li>
-
-    <!-- RCM section with indentation (dash → sub-item) -->
-    <li style="margin-top: 0.7rem;">
-      <a href="https://larryzpl123.github.io/RCM/en">🔄 RCM</a>
-      <!-- second level: What is RCM PDF (indented further) -->
+    <li>
+      <a href="http://larryzpl123.github.io/Olefin-Metathesis/simulator.html">Olefin Metathesis Simulator</a>
+    </li>
+    <li style="margin-top: 0.75rem;">
+      <a href="https://larryzpl123.github.io/RCM/EN">RCM</a>
       <ul>
         <li>
           <a href="https://larryzpl123.github.io/RCM/RCM_English.pdf">What is RCM PDF</a>
@@ -129,12 +125,14 @@
     </li>
   </ul>
 
-  <div class="meta-note">
-    <span>🔗 larryzpl123.github.io · Olefin Metathesis</span>
-    <span class="badge">index.html</span>
+  <div class="youtube-note">
+    <em>if you want to explore more into the mechanism</em><br/>
+    <a href="https://www.youtube.com/watch?v=c9tAuBLA2mI" target="_blank" rel="noopener noreferrer">YouTube · Olefin Metathesis Mechanism</a>
+  </div>
+
+  <div class="meta-footer">
+    larryzpl123.github.io · Olefin Metathesis
   </div>
 </div>
-
-<!-- All links open in same tab (standard behaviour). No extra Chinese, fully English. -->
 </body>
 </html>
