@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Metathesis Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f6f1e4;
+  --paper-dk: #ede6d3;
+  --paper-ddk: #dfd6bc;
+  --ink: #1a2433;
+  --ink-soft: #3a4657;
+  --rule: #c8bda0;
+  --rule-soft: #e1d7bd;
+  --moss: #2d5f3f;
+  --moss-lt: #4a8560;
+  --moss-dk: #1e4229;
+  --rust: #b8543d;
+  --rust-lt: #d17a63;
+  --sepia: #a67b4a;
+  --gold: #c69a5c;
+  --plum: #5b3a6c;
+  --stage-bg: #faf6e8;
+  --hi: #fef4d6;
+  --shadow: 0 1px 2px rgba(26,36,51,0.06), 0 4px 12px rgba(26,36,51,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(198, 154, 92, 0.08), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(45, 95, 63, 0.07), transparent 60%);
+  overflow: hidden;
+}
+
+/* ===== LAYOUT ===== */
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  padding: 14px;
+  gap: 14px;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 14px;
+  min-height: 0;
+}
+
+/* ===== HEADER ===== */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.brand h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-variation-settings: "SOFT" 50, "WONK" 1;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.brand h1 em { font-style: italic; color: var(--moss); font-weight: 400; }
+.brand .sub {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-top: 4px;
+}
+.topbar .ref-link {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border: 1px solid var(--rule);
+  padding: 8px 14px;
+  border-radius: 2px;
+  background: var(--paper);
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+.topbar .ref-link:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* ===== PANELS ===== */
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 18px;
+  overflow-y: auto;
+  position: relative;
+}
+.panel h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 17px;
+  margin-bottom: 4px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.panel .section-sub {
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 14px;
+}
+.panel .group {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dotted var(--rule);
+}
+.panel .group:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.panel .group-label {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel .group-label::before {
+  content: "";
+  width: 10px;
+  height: 1px;
+  background: var(--sepia);
+}
+
+/* ===== PILL SELECTORS ===== */
+.pill-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.pill-group.single { grid-template-columns: 1fr; }
+.pill {
+  background: var(--paper-dk);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 10px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  color: var(--ink-soft);
+  transition: all 0.15s;
+  position: relative;
+  line-height: 1.25;
+}
+.pill small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  opacity: 0.75;
+  margin-top: 2px;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.pill:hover:not(.active) {
+  background: var(--paper-ddk);
+  color: var(--ink);
+  border-color: var(--sepia);
+}
+.pill.active {
+  background: var(--moss);
+  color: var(--paper);
+  border-color: var(--moss-dk);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 3px rgba(45,95,63,0.3);
+}
+.pill.active small { color: rgba(246,241,228,0.75); }
+.pill:disabled, .pill.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===== CATALYST CARDS ===== */
+.cat-pill {
+  background: var(--paper-dk);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: all 0.15s;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  width: 100%;
+  font-weight: 500;
+}
+.cat-pill .cat-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 7px;
+  font-weight: 700;
+  box-shadow: inset -1px -1px 2px rgba(0,0,0,0.2);
+}
+.cat-pill .cat-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.cat-pill .cat-info small {
+  font-size: 9px;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+.cat-pill:hover:not(.active) {
+  background: var(--paper-ddk);
+  border-color: var(--sepia);
+}
+.cat-pill.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.cat-pill.active .cat-info small { color: rgba(246,241,228,0.7); }
+
+/* ===== METRICS ===== */
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.metric .label { color: var(--ink-soft); letter-spacing: 0.04em; }
+.metric .val { font-weight: 600; color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+.bar {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+}
+.bar-seg {
+  flex: 1;
+  height: 4px;
+  background: var(--rule-soft);
+  border-radius: 1px;
+}
+.bar-seg.filled { background: var(--moss); }
+.bar-seg.filled-rust { background: var(--rust); }
+.bar-seg.filled-gold { background: var(--gold); }
+
+/* ===== STAGE ===== */
+.stage {
+  background: var(--stage-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(45,95,63,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,95,63,0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-header {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--rule-soft);
+  background: rgba(246, 241, 228, 0.8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+.stage-title {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.stage-title em { color: var(--moss); font-style: italic; font-weight: 400; }
+.stage-step-badge {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--rust);
+  padding: 4px 10px;
+  border: 1px solid var(--rust);
+  border-radius: 20px;
+  background: var(--paper);
+  font-weight: 500;
+}
+
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.step-desc {
+  position: absolute;
+  left: 20px; right: 20px; bottom: 16px;
+  background: rgba(26, 36, 51, 0.92);
+  color: var(--paper);
+  padding: 12px 18px;
+  border-radius: 3px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+  letter-spacing: 0.01em;
+  font-family: 'JetBrains Mono', monospace;
+}
+.step-desc strong { color: var(--gold); letter-spacing: 0.08em; font-size: 10px; display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: 600; }
+.step-desc span.chem { color: var(--rust-lt); font-weight: 500; }
+
+/* ===== TIMELINE ===== */
+.timeline {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.tl-steps {
+  display: flex;
+  gap: 0;
+  align-items: center;
+}
+.tl-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tl-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--paper-ddk);
+  border: 1.5px solid var(--rule);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: 'JetBrains Mono', monospace;
+}
+.tl-dot.active {
+  background: var(--moss);
+  color: var(--paper);
+  border-color: var(--moss-dk);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px rgba(45, 95, 63, 0.15);
+}
+.tl-dot.done {
+  background: var(--moss-lt);
+  color: var(--paper);
+  border-color: var(--moss);
+}
+.tl-line {
+  width: 28px;
+  height: 1.5px;
+  background: var(--rule);
+  margin: 0 2px;
+}
+.tl-line.done { background: var(--moss); }
+
+.tl-controls {
+  display: flex;
+  gap: 8px;
+  justify-self: end;
+}
+.btn {
+  background: var(--paper-dk);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 10px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn.primary {
+  background: var(--rust);
+  color: var(--paper);
+  border-color: var(--rust);
+}
+.btn.primary:hover {
+  background: #9d4531;
+  border-color: #9d4531;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn svg { width: 11px; height: 11px; }
+
+.tl-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  white-space: nowrap;
+}
+
+/* ===== SCROLLBAR ===== */
+.panel::-webkit-scrollbar { width: 6px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+/* ===== INFO PANEL SPECIFICS ===== */
+.fact {
+  padding: 10px 0;
+  border-bottom: 1px dotted var(--rule);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.fact:last-child { border-bottom: none; }
+.fact .fact-label {
+  color: var(--sepia);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.fact .fact-value {
+  color: var(--ink);
+  font-weight: 500;
+}
+.fact .fact-value.big {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--moss-dk);
+  font-style: italic;
+}
+
+.ethylene-counter {
+  background: linear-gradient(135deg, rgba(184, 84, 61, 0.08), rgba(184, 84, 61, 0.02));
+  border: 1px solid rgba(184, 84, 61, 0.3);
+  padding: 10px 14px;
+  border-radius: 2px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ethylene-counter .label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rust);
+  font-weight: 500;
+}
+.ethylene-counter .count {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--rust);
+  line-height: 1;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.step-desc { animation: fadein 0.4s ease-out; }
+
+@keyframes float-up {
+  0% { transform: translate(0, 0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(0, -80px); opacity: 0; }
+}
+
+/* SVG element styles */
+.mol-atom {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  fill: var(--ink);
+  font-weight: 600;
+}
+.mol-bond {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+}
+.mol-dbond {
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+}
+.metal-ring {
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.hint {
+  background: var(--hi);
+  border: 1px solid var(--gold);
+  padding: 10px 14px;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin-top: 12px;
+}
+.hint strong { color: var(--rust); font-weight: 600; }
+
+/* ===== LOADING DOT (play indicator) ===== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulsing { animation: pulse 1.3s ease-in-out infinite; }
+
+@media (max-width: 1100px) {
+  .main { grid-template-columns: 230px 1fr 240px; }
+  .panel { padding: 14px; }
+}
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .app { height: auto; }
+  .main { grid-template-columns: 1fr; }
+  .stage { min-height: 500px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <h1>Metathesis <em>Simulator</em></h1>
+      <div class="sub">Chauvin Mechanism · Interactive</div>
+    </div>
+    <a href="info.html" class="ref-link">→ Read the reference</a>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="main">
+
+    <!-- LEFT: CONTROLS -->
+    <aside class="panel">
+      <h2>Setup</h2>
+      <div class="section-sub">Reaction · Catalyst · Substrate</div>
+
+      <div class="group">
+        <div class="group-label">Reaction Type</div>
+        <div class="pill-group" id="rxn-group">
+          <button class="pill active" data-rxn="CM">CM<small>Cross</small></button>
+          <button class="pill" data-rxn="RCM">RCM<small>Ring-Close</small></button>
+          <button class="pill" data-rxn="ROM">ROM<small>Ring-Open</small></button>
+          <button class="pill" data-rxn="ROMP">ROMP<small>Polymer.</small></button>
+          <button class="pill" data-rxn="ADMET">ADMET<small>Step-Growth</small></button>
+          <button class="pill" data-rxn="ENYNE">Enyne<small>Diene</small></button>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Catalyst</div>
+        <div id="cat-group">
+          <button class="cat-pill active" data-cat="G1">
+            <span class="cat-dot" style="background: radial-gradient(circle at 30% 30%, #4a8560, #1e4229)">Ru</span>
+            <span class="cat-info">Grubbs 1st Gen<small>PCy₃ · Cl₂ · =CHPh</small></span>
+          </button>
+          <button class="cat-pill" data-cat="G2">
+            <span class="cat-dot" style="background: radial-gradient(circle at 30% 30%, #4a8560, #1e4229)">Ru</span>
+            <span class="cat-info">Grubbs 2nd Gen<small>H₂IMes · PCy₃ · Cl₂</small></span>
+          </button>
+          <button class="cat-pill" data-cat="HG2">
+            <span class="cat-dot" style="background: radial-gradient(circle at 30% 30%, #4a8560, #1e4229)">Ru</span>
+            <span class="cat-info">Hoveyda–Grubbs II<small>Chelating iPrO-benzyl.</small></span>
+          </button>
+          <button class="cat-pill" data-cat="G3">
+            <span class="cat-dot" style="background: radial-gradient(circle at 30% 30%, #4a8560, #1e4229)">Ru</span>
+            <span class="cat-info">Grubbs 3rd Gen<small>3-Br-pyridine · fast init</small></span>
+          </button>
+          <button class="cat-pill" data-cat="SCHROCK">
+            <span class="cat-dot" style="background: radial-gradient(circle at 30% 30%, #8b65a8, #3b1f5c)">Mo</span>
+            <span class="cat-info">Schrock Mo<small>Imido · alkoxide</small></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Substrate preset</div>
+        <div class="pill-group single" id="sub-group">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Conditions</div>
+        <div class="metric">
+          <span class="label">Temperature</span>
+          <span class="val" id="temp-val">40 °C</span>
+        </div>
+        <input type="range" id="temp-slider" min="20" max="80" value="40" style="width: 100%; accent-color: var(--moss);">
+        <div class="metric" style="margin-top: 10px;">
+          <span class="label">Catalyst load</span>
+          <span class="val" id="load-val">5 mol%</span>
+        </div>
+        <input type="range" id="load-slider" min="1" max="20" value="5" style="width: 100%; accent-color: var(--moss);">
+      </div>
+    </aside>
+
+    <!-- CENTER: STAGE -->
+    <main class="stage">
+      <div class="stage-header">
+        <div class="stage-title" id="stage-title">Cross <em>Metathesis</em> · 1-pentene + styrene</div>
+        <div class="stage-step-badge" id="stage-badge">Step 0 / 5 · Ready</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <svg id="canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="rxn-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#b8543d"/>
+            </marker>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g id="stage-content"></g>
+        </svg>
+      </div>
+
+      <div class="step-desc" id="step-desc">
+        <strong>READY</strong>
+        Choose a reaction, catalyst, and substrate, then press <em>START</em> to begin the catalytic cycle. The simulator walks through each step of Chauvin's mechanism — coordination, [2+2] cycloaddition, metallacyclobutane, retro-[2+2], and product release.
+      </div>
+    </main>
+
+    <!-- RIGHT: INFO -->
+    <aside class="panel">
+      <h2>Readout</h2>
+      <div class="section-sub">Live reaction data</div>
+
+      <div class="group">
+        <div class="group-label">Catalyst profile</div>
+        <div class="metric">
+          <span class="label">Activity</span>
+          <span class="val" id="cat-activity">3/5</span>
+        </div>
+        <div class="bar" id="bar-activity"></div>
+        <div class="metric" style="margin-top: 10px;">
+          <span class="label">FG tolerance</span>
+          <span class="val" id="cat-tolerance">4/5</span>
+        </div>
+        <div class="bar" id="bar-tolerance"></div>
+        <div class="metric" style="margin-top: 10px;">
+          <span class="label">Initiation</span>
+          <span class="val" id="cat-init">4/5</span>
+        </div>
+        <div class="bar" id="bar-init"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Reaction readout</div>
+        <div class="fact">
+          <div class="fact-label">Driving force</div>
+          <div class="fact-value" id="driver">Ethylene extrusion</div>
+        </div>
+        <div class="fact">
+          <div class="fact-label">E / Z ratio</div>
+          <div class="fact-value big" id="ez-ratio">≈ 4 : 1</div>
+        </div>
+        <div class="fact">
+          <div class="fact-label">Expected product</div>
+          <div class="fact-value" id="product-name">(E)-1-phenylhex-1-ene</div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Turnover counter</div>
+        <div class="ethylene-counter">
+          <div class="label">Cycles</div>
+          <div class="count" id="turnover-count">0</div>
+        </div>
+        <div class="ethylene-counter" style="margin-top: 8px; background: linear-gradient(135deg, rgba(45,95,63,0.08), rgba(45,95,63,0.02)); border-color: rgba(45,95,63,0.3);">
+          <div class="label" style="color: var(--moss)">C₂H₄ released</div>
+          <div class="count" id="ethylene-count" style="color: var(--moss)">0</div>
+        </div>
+      </div>
+
+      <div class="hint" id="hint-text">
+        <strong>Tip.</strong> Grubbs catalysts are phosphine-dissociation gated. Before metathesis can happen, a PCy₃ must leave to open a coordination site.
+      </div>
+    </aside>
+  </div>
+
+  <!-- TIMELINE + CONTROLS -->
+  <footer class="timeline">
+    <div class="tl-label">Cycle Progress</div>
+    <div class="tl-steps" id="timeline">
+      <!-- populated -->
+    </div>
+    <div class="tl-controls">
+      <button class="btn" id="btn-reset">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 3V1L4 4l4 3V5a4 4 0 11-4 4H2a6 6 0 106-6z"/></svg>
+        Reset
+      </button>
+      <button class="btn" id="btn-step">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l8 6-8 6V2zM13 3h2v10h-2V3z"/></svg>
+        Step
+      </button>
+      <button class="btn primary" id="btn-play">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2v12l10-6L3 2z"/></svg>
+        Start
+      </button>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// DATA
+// ============================================================
+
+const CATALYSTS = {
+  G1:      { metal: 'Ru', color: '#3d6f4f', ring: '#4a8560', name: 'Grubbs 1st Gen',       activity: 3, tolerance: 4, init: 5, ez: '4 : 1',     notes: 'PCy₃ dissociation is rate-limiting. Good FG tolerance; slower than G2 on hindered substrates.' },
+  G2:      { metal: 'Ru', color: '#3d6f4f', ring: '#4a8560', name: 'Grubbs 2nd Gen',       activity: 5, tolerance: 5, init: 3, ez: '5 : 1',     notes: 'NHC ligand dramatically increases activity. Workhorse catalyst. Slower initiation than G1.' },
+  HG2:     { metal: 'Ru', color: '#3d6f4f', ring: '#4a8560', name: 'Hoveyda–Grubbs II',    activity: 4, tolerance: 5, init: 2, ez: '5 : 1',     notes: 'Phosphine-free chelating ligand makes it robust and recyclable. Slower initiation.' },
+  G3:      { metal: 'Ru', color: '#3d6f4f', ring: '#4a8560', name: 'Grubbs 3rd Gen',       activity: 4, tolerance: 5, init: 5, ez: '5 : 1',     notes: 'Labile 3-Br-pyridines give very fast initiation — preferred for living ROMP.' },
+  SCHROCK: { metal: 'Mo', color: '#5b3a8c', ring: '#7a4eb3', name: 'Schrock Mo',           activity: 5, tolerance: 1, init: 5, ez: '3 : 1',     notes: 'Highest activity on tri/tetrasubstituted alkenes. Air/moisture sensitive — requires glovebox.' },
+};
+
+// Each reaction: name, substrates, product, driver, substrate options
+const REACTIONS = {
+  CM: {
+    name: 'Cross Metathesis',
+    subtitle: 'two alkenes → two new alkenes',
+    driver: 'Ethylene extrusion (open system)',
+    ethylenePerCycle: 1,
+    isPolymer: false,
+    substrates: [
+      { id: 'pent-styr', label: '1-pentene + styrene',          R1: 'nPr',  R2: 'Ph',  product: '(E)-1-phenyl-1-hexene' },
+      { id: 'allyl-acryl', label: 'allylbenzene + methyl acryl.', R1: 'CH₂Ph', R2: 'CO₂Me', product: 'PhCH₂CH=CHCO₂Me (E)' },
+      { id: 'decene',    label: '1-decene homodimerization',     R1: 'nOct', R2: 'nOct', product: '(E)-9-octadecene' },
+    ],
+  },
+  RCM: {
+    name: 'Ring-Closing Metathesis',
+    subtitle: 'α,ω-diene → cycloalkene + C₂H₄',
+    driver: 'Ethylene extrusion · intramolecular',
+    ethylenePerCycle: 1,
+    isPolymer: false,
+    substrates: [
+      { id: 'octa',  label: '1,7-octadiene → cyclohexene',  tether: 4, ring: 6, product: 'cyclohexene' },
+      { id: 'hepta', label: '1,6-heptadiene → cyclopentene', tether: 3, ring: 5, product: 'cyclopentene' },
+      { id: 'macro', label: 'diene → macrocycle (14-mem)',   tether: 10, ring: 14, product: '14-membered macrocycle' },
+    ],
+  },
+  ROM: {
+    name: 'Ring-Opening Metathesis',
+    subtitle: 'strained cycloalkene + alkene → diene',
+    driver: 'Ring-strain relief (single turnover)',
+    ethylenePerCycle: 0,
+    isPolymer: false,
+    substrates: [
+      { id: 'norb-styr', label: 'norbornene + styrene',  strain: 27, product: 'acyclic styryl-cyclopentane diene' },
+      { id: 'cyclobut',  label: 'cyclobutene + 1-hexene', strain: 30, product: 'acyclic octa-1,6-diene' },
+    ],
+  },
+  ROMP: {
+    name: 'Ring-Opening Metathesis Polymerization',
+    subtitle: 'strained cycloalkene → polymer',
+    driver: 'Ring-strain relief · chain growth',
+    ethylenePerCycle: 0,
+    isPolymer: true,
+    substrates: [
+      { id: 'norb',      label: 'norbornene → polynorbornene', strain: 27, product: 'polynorbornene (Đ ≈ 1.05 with G3)' },
+      { id: 'cyclooct',  label: 'cyclooctene → Vestenamer',     strain: 7,  product: 'polyoctenamer' },
+      { id: 'dcpd',      label: 'DCPD → thermoset',             strain: 27, product: 'cross-linked polyDCPD' },
+    ],
+  },
+  ADMET: {
+    name: 'Acyclic Diene Metathesis',
+    subtitle: 'α,ω-diene → linear polymer + C₂H₄',
+    driver: 'Ethylene extrusion · step-growth',
+    ethylenePerCycle: 1,
+    isPolymer: true,
+    substrates: [
+      { id: 'hexadiene', label: '1,9-decadiene → ADMET polymer', product: 'linear unsaturated polymer' },
+      { id: 'longchain', label: 'α,ω-diester → biobased polyester', product: 'long-chain aliphatic polyester' },
+    ],
+  },
+  ENYNE: {
+    name: 'Enyne Metathesis',
+    subtitle: 'alkene + alkyne → 1,3-diene',
+    driver: 'Atom economy (no byproduct)',
+    ethylenePerCycle: 0,
+    isPolymer: false,
+    substrates: [
+      { id: 'intra', label: 'intramolecular enyne → diene', product: 'cyclic 1,3-diene' },
+      { id: 'inter', label: 'alkene + phenylacetylene',     product: '2-phenyl-1,3-diene' },
+    ],
+  },
+};
+
+const STEP_NAMES = ['Resting', 'Dissociation', 'Coordination', '[2+2]', 'Metallacyclobutane', 'Retro-[2+2]'];
+const TOTAL_STEPS = STEP_NAMES.length; // 6 phases, indexed 0..5
+
+// Step descriptions vary by reaction + step
+function stepText(rxn, step, state) {
+  const cat = CATALYSTS[state.catalyst];
+  const sub = getCurrentSubstrate(state);
+  switch (step) {
+    case 0: return { title: 'READY', body: `${cat.name} sitting at rest as a 16-electron complex. Substrate molecules float freely. Press <em>STEP</em> or <em>START</em> to begin.` };
+    case 1: return { title: 'LIGAND DISSOCIATION', body: cat.metal === 'Ru'
+        ? `A labile ligand (PCy₃ for G1/G2, benzylidene ether for HG2, 3-Br-pyridine for G3) dissociates, opening a coordination site on the metal.`
+        : `The Schrock Mo alkylidene is already coordinatively unsaturated — it proceeds directly to substrate coordination.` };
+    case 2: return { title: 'COORDINATION', body: `An incoming alkene ${rxn === 'RCM' ? '(the distal vinyl of the tethered diene) ' : ''}approaches the metal center and coordinates through its π-bond.` };
+    case 3: return { title: '[2+2] CYCLOADDITION', body: `The M=C and C=C bonds align and collapse into a four-membered ring — the <span class="chem">metallacyclobutane</span>. This is the key bond-reorganization step.` };
+    case 4: return { title: 'METALLACYCLOBUTANE', body: `The strained metallacyclobutane is the highest-energy intermediate on the productive path. It can fragment in two ways: back to starting material (non-productive) or forward to products (productive).` };
+    case 5:
+      if (rxn === 'RCM') return { title: 'RETRO-[2+2] · RING CLOSED', body: `Productive fragmentation releases <span class="chem">ethylene</span> and a new ruthenium methylidene — leaving behind a closed <span class="chem">${sub.product}</span>.` };
+      if (rxn === 'ROMP') return { title: 'CHAIN PROPAGATION', body: `The metallacyclobutane opens in the strain-relieving direction — giving a new alkylidene with the polymer chain attached. Another monomer now binds, and the cycle repeats.` };
+      if (rxn === 'ROM') return { title: 'RETRO-[2+2] · RING OPENED', body: `Strain relief drives productive fragmentation. The ring is broken — product <span class="chem">${sub.product}</span> — and the catalyst now carries the alkylidene partner.` };
+      if (rxn === 'ADMET') return { title: 'CHAIN EXTENSION + C₂H₄', body: `Ethylene extrudes and the polymer chain grows by one monomer unit. Step-growth: every couple joins two chains.` };
+      if (rxn === 'ENYNE') return { title: 'VINYL CARBENE → DIENE', body: `The metallacyclobutene (from alkyne) opens to a vinyl carbene, which reacts with a second alkene to release the <span class="chem">1,3-diene</span> product. Atom-economical — no byproduct.` };
+      return { title: 'PRODUCTS', body: `Ethylene released; new alkene product formed. Catalyst carries the other half as its new alkylidene.` };
+  }
+}
+
+// ============================================================
+// STATE
+// ============================================================
+
+const state = {
+  reaction: 'CM',
+  catalyst: 'G1',
+  substrateIdx: 0,
+  step: 0,
+  turnovers: 0,
+  ethylene: 0,
+  playing: false,
+  playTimer: null,
+  temp: 40,
+  load: 5,
+};
+
+function getCurrentReaction() { return REACTIONS[state.reaction]; }
+function getCurrentSubstrate() { return getCurrentReaction().substrates[state.substrateIdx]; }
+
+// ============================================================
+// RENDERING
+// ============================================================
+
+const stageContent = document.getElementById('stage-content');
+
+// Color accessors
+function metalColor() { return CATALYSTS[state.catalyst].color; }
+function metalRing()  { return CATALYSTS[state.catalyst].ring; }
+function metalSymbol(){ return CATALYSTS[state.catalyst].metal; }
+
+// === Molecule drawing primitives ===
+
+function drawMetal(x, y, size=30, labelOverride=null) {
+  const sym = labelOverride || metalSymbol();
+  return `
+    <g class="metal" transform="translate(${x},${y})">
+      <circle r="${size}" fill="${metalColor()}" stroke="${metalRing()}" stroke-width="2.5"/>
+      <circle r="${size-4}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="0" y="5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="700" fill="white">${sym}</text>
+    </g>`;
+}
+
+// draw a C=C with R₁, R₂ substituents; orientation horizontal
+function drawAlkene(x, y, leftLabel, rightLabel, opts={}) {
+  const spread = opts.spread || 50;
+  const offset = opts.offset || 4;
+  return `
+    <g transform="translate(${x},${y})">
+      <text x="${-spread}" y="5" text-anchor="end" class="mol-atom">${leftLabel}</text>
+      <line x1="${-spread+12}" y1="${-offset/2}" x2="${spread-12}" y2="${-offset/2}" class="mol-dbond"/>
+      <line x1="${-spread+12}" y1="${offset/2}" x2="${spread-12}" y2="${offset/2}" class="mol-dbond"/>
+      <text x="${spread}" y="5" text-anchor="start" class="mol-atom">${rightLabel}</text>
+    </g>`;
+}
+
+// draw metal=CHR alkylidene (horizontal, double bond on right of metal)
+function drawAlkylidene(x, y, rLabel) {
+  return `
+    <g transform="translate(${x},${y})">
+      ${drawMetal(0, 0, 28)}
+      <line x1="28" y1="-3" x2="68" y2="-3" class="mol-dbond"/>
+      <line x1="28" y1="3" x2="68" y2="3" class="mol-dbond"/>
+      <text x="74" y="5" class="mol-atom">${rLabel}</text>
+    </g>`;
+}
+
+// metallacyclobutane — 4-member square ring, metal at top-left corner, carbons at other three
+function drawMCB(cx, cy, labels) {
+  // labels: [metalSym-unused, TR_label, BL_label, BR_label]
+  const s = 34; // half-side of square
+  return `
+    <g transform="translate(${cx},${cy})">
+      ${drawMetal(-s, -s, 22)}
+      <!-- 4 ring bonds, all closing at corners -->
+      <line x1="${-s+22}" y1="${-s}" x2="${s}" y2="${-s}" class="mol-bond"/>
+      <line x1="${s}" y1="${-s}" x2="${s}" y2="${s}" class="mol-bond"/>
+      <line x1="${-s}" y1="${s}" x2="${s}" y2="${s}" class="mol-bond"/>
+      <line x1="${-s}" y1="${-s+22}" x2="${-s}" y2="${s}" class="mol-bond"/>
+      <!-- labels placed cleanly outside each non-metal corner -->
+      <text x="${s}" y="${-s-10}" text-anchor="middle" class="mol-atom">${labels[1]}</text>
+      <text x="${-s}" y="${s+20}" text-anchor="middle" class="mol-atom">${labels[2]}</text>
+      <text x="${s}" y="${s+20}" text-anchor="middle" class="mol-atom">${labels[3]}</text>
+    </g>`;
+}
+
+// ethylene molecule (standalone)
+function drawEthylene(x, y, opts={}) {
+  const float = opts.float ? ` style="animation: float-up 1.4s ease-out forwards;"` : '';
+  return `
+    <g transform="translate(${x},${y})"${float}>
+      <text x="-20" y="5" text-anchor="end" class="mol-atom" fill="#b8543d">H₂C</text>
+      <line x1="-14" y1="-3" x2="14" y2="-3" class="mol-dbond" stroke="#b8543d"/>
+      <line x1="-14" y1="3" x2="14" y2="3" class="mol-dbond" stroke="#b8543d"/>
+      <text x="20" y="5" text-anchor="start" class="mol-atom" fill="#b8543d">CH₂</text>
+    </g>`;
+}
+
+// cyclohexene / cyclopentene ring
+function drawRing(cx, cy, n=6, label='', size=28, hasDoubleBond=true) {
+  const angle0 = -Math.PI/2;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = angle0 + i * 2 * Math.PI / n;
+    pts.push([cx + size * Math.cos(a), cy + size * Math.sin(a)]);
+  }
+  let paths = '';
+  for (let i = 0; i < n; i++) {
+    const [x1, y1] = pts[i];
+    const [x2, y2] = pts[(i+1) % n];
+    paths += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="mol-bond"/>`;
+    // double bond on top edge
+    if (hasDoubleBond && i === 0) {
+      const dx = (x2 - x1) * 0.15, dy = (y2 - y1) * 0.15;
+      const nx = -(y2 - y1) / Math.hypot(x2 - x1, y2 - y1) * 4;
+      const ny =  (x2 - x1) / Math.hypot(x2 - x1, y2 - y1) * 4;
+      paths += `<line x1="${x1 + dx + nx}" y1="${y1 + dy + ny}" x2="${x2 - dx + nx}" y2="${y2 - dy + ny}" class="mol-bond"/>`;
+    }
+  }
+  return `
+    <g>
+      ${paths}
+      ${label ? `<text x="${cx}" y="${cy+5}" text-anchor="middle" class="mol-atom" font-size="11">${label}</text>` : ''}
+    </g>`;
+}
+
+// norbornene: pentagon (5-member ring) with methano bridge above + strained C=C
+function drawNorbornene(cx, cy, opened=false) {
+  if (opened) {
+    // opened form: trans-diene tethered through a cyclopentane remnant
+    return `
+      <g transform="translate(${cx},${cy})">
+        <!-- left vinyl terminus -->
+        <text x="-82" y="5" text-anchor="end" class="mol-atom" font-size="12">~</text>
+        <line x1="-74" y1="-3" x2="-52" y2="-3" class="mol-dbond"/>
+        <line x1="-74" y1="3" x2="-52" y2="3" class="mol-dbond"/>
+        <!-- cyclopentane remnant -->
+        <polygon points="-44,6 -22,-14 8,-6 6,22 -24,26" class="mol-bond" fill="none"/>
+        <!-- right vinyl -->
+        <line x1="14" y1="-3" x2="36" y2="-3" class="mol-dbond"/>
+        <line x1="14" y1="3" x2="36" y2="3" class="mol-dbond"/>
+        <text x="44" y="5" text-anchor="start" class="mol-atom" font-size="12">~</text>
+      </g>`;
+  }
+  // closed: bicyclic norbornene (pentagon + methano bridge + clear double bond)
+  return `
+    <g transform="translate(${cx},${cy})">
+      <!-- pentagon (5-member ring seen edge-on) -->
+      <polygon points="-28,-4 28,-4 36,20 0,38 -36,20" class="mol-bond" fill="none"/>
+      <!-- double bond on front edge (the strained C=C) -->
+      <line x1="-24" y1="-10" x2="24" y2="-10" class="mol-bond"/>
+      <!-- methano bridge to CH2 above -->
+      <line x1="-28" y1="-4" x2="0" y2="-26" class="mol-bond"/>
+      <line x1="28" y1="-4" x2="0" y2="-26" class="mol-bond"/>
+      <text x="0" y="-30" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">CH₂</text>
+      <text x="0" y="54" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">norbornene</text>
+    </g>`;
+}
+
+// polymer chain for ROMP progress — clean zigzag with alternating double bonds
+function drawPolymerChain(x, y, units) {
+  let path = 'M 0 0';
+  let dbonds = '';
+  for (let i = 0; i < units; i++) {
+    const sx = i * 48;
+    path += ` L ${sx+12} -10 L ${sx+24} 0 L ${sx+36} -10 L ${sx+48} 0`;
+    // double bond: short parallel segment alongside the first descending edge
+    dbonds += `<line x1="${sx+16}" y1="${-12}" x2="${sx+22}" y2="${-2}" class="mol-bond"/>`;
+  }
+  return `<g transform="translate(${x},${y})">
+    <text x="-14" y="5" text-anchor="end" class="mol-atom" font-size="13">~</text>
+    <path d="${path}" class="mol-bond"/>
+    ${dbonds}
+    <text x="${units*48+10}" y="5" text-anchor="start" class="mol-atom" font-size="13">~</text>
+  </g>`;
+}
+
+// arrow between positions (straight, not curved)
+function drawArrow(x1, y1, x2, y2, label='', dash=false) {
+  return `<g>
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+          stroke="#b8543d" stroke-width="1.8" fill="none"
+          ${dash ? 'stroke-dasharray="4 4"' : ''}
+          marker-end="url(#rxn-arr)"/>
+    ${label ? `<text x="${(x1+x2)/2}" y="${Math.min(y1,y2)-8}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-style="italic" fill="#3a4657">${label}</text>` : ''}
+  </g>`;
+}
+
+// ============================================================
+// SCENE RENDERING (state → SVG content)
+// ============================================================
+
+function renderScene() {
+  const rxn = state.reaction;
+  const step = state.step;
+  const sub = getCurrentSubstrate();
+
+  if (rxn === 'CM') {
+    stageContent.innerHTML = renderCM(step, sub);
+  } else if (rxn === 'RCM') {
+    stageContent.innerHTML = renderRCM(step, sub);
+  } else if (rxn === 'ROM') {
+    stageContent.innerHTML = renderROM(step, sub);
+  } else if (rxn === 'ROMP') {
+    stageContent.innerHTML = renderROMP(step, sub);
+  } else if (rxn === 'ADMET') {
+    stageContent.innerHTML = renderADMET(step, sub);
+  } else if (rxn === 'ENYNE') {
+    stageContent.innerHTML = renderEnyne(step, sub);
+  }
+}
+
+// --- CM scene ---
+function renderCM(step, sub) {
+  // Step 0: catalyst + two alkenes separate
+  // Step 1: catalyst alkylidene alone in center, labile ligand dissociated
+  // Step 2: one substrate approaches
+  // Step 3: [2+2] — lines bridging metal to alkene
+  // Step 4: metallacyclobutane
+  // Step 5: retro-[2+2] → new alkylidene + ethylene
+
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(220, 220, 'Ph')}
+      <text x="220" y="290" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657" letter-spacing="0.08em">CATALYST · M=CHPh</text>
+      ${drawAlkene(550, 160, 'H₂C', `CH–${sub.R1}`, {spread: 55})}
+      <text x="550" y="195" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">substrate A</text>
+      ${drawAlkene(550, 320, 'H₂C', `CH–${sub.R2}`, {spread: 55})}
+      <text x="550" y="355" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">substrate B</text>
+    `,
+    1: `
+      ${drawAlkylidene(380, 240, 'Ph')}
+      <text x="380" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657" letter-spacing="0.08em">14-ELECTRON ACTIVE SPECIES</text>
+      <text x="380" y="320" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">− PCy₃ (ligand dissociated)</text>
+      ${drawAlkene(610, 240, 'H₂C', `CH–${sub.R1}`, {spread: 55})}
+    `,
+    2: `
+      ${drawAlkylidene(280, 240, 'Ph')}
+      ${drawAlkene(480, 240, 'H₂C', `CH–${sub.R1}`, {spread: 55})}
+      ${drawArrow(355, 232, 420, 232, 'coordinates', false)}
+    `,
+    3: `
+      ${drawMCB(400, 250, ['M', `CH–Ph`, `CH₂`, `CH–${sub.R1}`])}
+      <text x="400" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d" letter-spacing="0.12em">[2+2] CYCLOADDITION</text>
+    `,
+    4: `
+      ${drawMCB(400, 250, ['M', `CH–Ph`, `CH₂`, `CH–${sub.R1}`])}
+      <text x="400" y="340" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">metallacyclobutane intermediate</text>
+      <text x="400" y="360" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#3a4657">(can fragment productively or non-productively)</text>
+    `,
+    5: `
+      ${drawAlkylidene(180, 240, `H`)}
+      <text x="180" y="295" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">new methylidene · ready for next turnover</text>
+      ${drawAlkene(560, 210, 'Ph–HC', `CH–${sub.R1}`, {spread: 60})}
+      <text x="560" y="245" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">(E)-${sub.product}</text>
+      ${drawEthylene(560, 340, {float: false})}
+      <text x="560" y="375" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">ethylene byproduct ↑</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// --- RCM scene ---
+function renderRCM(step, sub) {
+  const tether = sub.tether || 4;
+  // tether drawn as zigzag line between two vinyls
+
+  function drawDiene(cx, cy, tetherN) {
+    let zig = '';
+    let startX = -((tetherN+1) * 14) / 2;
+    let pts = [];
+    for (let i = 0; i <= tetherN+1; i++) {
+      const px = startX + i * 14;
+      const py = (i % 2 === 0) ? 0 : -10;
+      pts.push([px, py]);
+    }
+    // zigzag
+    let d = `M ${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) d += ` L ${pts[i][0]} ${pts[i][1]}`;
+    return `<g transform="translate(${cx},${cy})">
+      <text x="${pts[0][0]-30}" y="5" class="mol-atom" text-anchor="end">H₂C</text>
+      <line x1="${pts[0][0]-22}" y1="-3" x2="${pts[0][0]-6}" y2="-3" class="mol-dbond"/>
+      <line x1="${pts[0][0]-22}" y1="3" x2="${pts[0][0]-6}" y2="3" class="mol-dbond"/>
+      <path d="${d}" class="mol-bond"/>
+      <line x1="${pts[pts.length-1][0]+6}" y1="-3" x2="${pts[pts.length-1][0]+22}" y2="-3" class="mol-dbond"/>
+      <line x1="${pts[pts.length-1][0]+6}" y1="3" x2="${pts[pts.length-1][0]+22}" y2="3" class="mol-dbond"/>
+      <text x="${pts[pts.length-1][0]+30}" y="5" class="mol-atom">CH₂</text>
+    </g>`;
+  }
+
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(180, 230, 'Ph')}
+      ${drawDiene(530, 230, tether)}
+      <text x="530" y="275" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#3a4657">α,ω-diene (${tether+2} carbons)</text>
+    `,
+    1: `
+      ${drawAlkylidene(380, 240, 'Ph')}
+      <text x="380" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">− PCy₃ (ligand dissociated)</text>
+      ${drawDiene(580, 240, tether)}
+    `,
+    2: `
+      ${drawAlkylidene(240, 240, 'Ph')}
+      ${drawDiene(480, 240, tether)}
+      ${drawArrow(320, 232, 410, 232, 'binds one vinyl', false)}
+    `,
+    3: `
+      ${drawMCB(360, 250, ['M', 'CH', 'CH–Ph', 'CH'])}
+      <!-- tether loop from TR carbon to BR carbon of MCB -->
+      <path d="M 394 220 Q 490 250 394 280" class="mol-bond" fill="none" stroke-dasharray="5 4"/>
+      <text x="480" y="254" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">(CH₂)${tether}</text>
+      <text x="400" y="360" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d" letter-spacing="0.1em">FIRST [2+2] · TETHER HANGING AS LOOP</text>
+    `,
+    4: `
+      ${drawAlkylidene(200, 240, 'CH–(chain)')}
+      <!-- large partial ring almost closed -->
+      <g transform="translate(500,240)">
+        <path d="M -50 0 Q -30 -60 30 -60 Q 80 -60 80 0 Q 80 50 30 60 Q -20 60 -50 20" class="mol-bond" fill="none"/>
+        <text x="20" y="5" text-anchor="middle" class="mol-atom" font-size="11" fill="#3a4657">forming ring</text>
+      </g>
+      ${drawArrow(300, 232, 420, 232, 'intramolecular', false)}
+      <text x="400" y="360" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">second [2+2] — ring closure imminent</text>
+    `,
+    5: `
+      ${drawAlkylidene(150, 240, `H`)}
+      ${drawRing(500, 240, sub.ring || 6, '', 38, true)}
+      <text x="500" y="320" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">${sub.product}</text>
+      ${drawEthylene(680, 180)}
+      <text x="680" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">ethylene ↑</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// --- ROM scene (single turnover) ---
+function renderROM(step, sub) {
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(180, 240, 'Ph')}
+      ${drawNorbornene(520, 240)}
+      <text x="520" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">ring strain: ${sub.strain} kcal/mol</text>
+    `,
+    1: `
+      ${drawAlkylidene(380, 240, 'Ph')}
+      ${drawNorbornene(620, 240)}
+      <text x="380" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">− PCy₃ (ligand dissociated)</text>
+    `,
+    2: `
+      ${drawAlkylidene(270, 240, 'Ph')}
+      ${drawNorbornene(490, 240)}
+      ${drawArrow(340, 232, 440, 232, 'coordinates', false)}
+    `,
+    3: `
+      ${drawMCB(380, 250, ['M', 'CH', 'CH–Ph', 'CH'])}
+      <!-- bicyclic bridge still intact on the substrate side -->
+      <path d="M 414 220 Q 500 250 414 280" class="mol-bond" fill="none" stroke-dasharray="5 4"/>
+      <text x="500" y="254" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">strained bridge</text>
+      <text x="400" y="370" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d" letter-spacing="0.1em">[2+2] ONTO STRAINED C=C</text>
+    `,
+    4: `
+      ${drawMCB(380, 250, ['M', 'CH', 'CH–Ph', 'CH'])}
+      <path d="M 414 220 Q 510 250 414 280" class="mol-bond" fill="none" stroke-dasharray="5 4"/>
+      <text x="510" y="254" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">strain: ${sub.strain} kcal/mol</text>
+      <text x="400" y="370" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#2d5f3f">strained metallacyclobutane — ring strain drives ring-opening</text>
+    `,
+    5: `
+      ${drawAlkylidene(140, 240, `~R`)}
+      <text x="170" y="295" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">alkylidene attached to opened chain</text>
+      ${drawNorbornene(560, 240, true)}
+      <text x="560" y="295" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#2d5f3f">${sub.product}</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// --- ROMP scene ---
+function renderROMP(step, sub) {
+  const chainUnits = Math.min(state.turnovers, 5);
+
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(180, 240, 'Ph')}
+      ${drawNorbornene(480, 240)}
+      ${drawNorbornene(640, 240)}
+      <text x="560" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">strained monomer pool</text>
+    `,
+    1: `
+      ${drawAlkylidene(380, 240, 'Ph')}
+      <text x="380" y="300" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">− L (ligand dissociated)</text>
+      ${drawNorbornene(620, 240)}
+    `,
+    2: `
+      ${drawAlkylidene(260, 240, chainUnits > 0 ? '~chain' : 'Ph')}
+      ${drawNorbornene(480, 240)}
+      ${drawArrow(340, 232, 430, 232, 'binds', false)}
+      ${chainUnits > 0 ? drawPolymerChain(30, 390, chainUnits) : ''}
+    `,
+    3: `
+      ${drawMCB(380, 250, ['M', 'CH', chainUnits > 0 ? '~chain' : 'CH–Ph', 'CH'])}
+      <path d="M 414 220 Q 500 250 414 280" class="mol-bond" fill="none" stroke-dasharray="5 4"/>
+      <text x="500" y="254" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">strained bridge</text>
+      ${chainUnits > 0 ? drawPolymerChain(30, 420, chainUnits) : ''}
+      <text x="400" y="370" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d" letter-spacing="0.1em">[2+2] CYCLOADDITION</text>
+    `,
+    4: `
+      ${drawMCB(380, 250, ['M', 'CH', chainUnits > 0 ? '~chain' : 'CH–Ph', 'CH'])}
+      <path d="M 414 220 Q 500 250 414 280" class="mol-bond" fill="none" stroke-dasharray="5 4"/>
+      <text x="500" y="254" text-anchor="middle" class="mol-atom" font-size="10" fill="#3a4657">bridge</text>
+      ${chainUnits > 0 ? drawPolymerChain(30, 420, chainUnits) : ''}
+      <text x="400" y="370" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#2d5f3f">metallacyclobutane · about to open in strain-relieving sense</text>
+    `,
+    5: `
+      ${drawAlkylidene(120, 240, '~chain')}
+      ${drawPolymerChain(190, 240, chainUnits + 1)}
+      <text x="400" y="320" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">polynorbornene · chain extended by 1 unit</text>
+      <text x="400" y="345" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">catalyst still bound at chain end — ready for another monomer</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// --- ADMET scene ---
+function renderADMET(step, sub) {
+  function chain(cx, cy, label) {
+    return `<g transform="translate(${cx},${cy})">
+      <text x="-55" y="5" text-anchor="end" class="mol-atom">H₂C</text>
+      <line x1="-46" y1="-3" x2="-32" y2="-3" class="mol-dbond"/>
+      <line x1="-46" y1="3" x2="-32" y2="3" class="mol-dbond"/>
+      <path d="M -24 0 L -12 -10 L 0 0 L 12 -10 L 24 0 L 36 -10" class="mol-bond"/>
+      <text x="44" y="5" class="mol-atom" font-size="10" fill="#3a4657">${label}</text>
+    </g>`;
+  }
+
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(160, 240, 'Ph')}
+      ${chain(460, 200, '(CH₂)ₙ=')}
+      ${chain(460, 280, '(CH₂)ₙ=')}
+      <text x="460" y="330" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">multiple α,ω-diene monomers</text>
+    `,
+    1: `${drawAlkylidene(380, 240, 'Ph')} ${chain(620, 240, '(CH₂)ₙ=')}`,
+    2: `${drawAlkylidene(260, 240, 'Ph')} ${chain(500, 240, '(CH₂)ₙ=')} ${drawArrow(320, 232, 430, 232, 'coordinates', false)}`,
+    3: `<g transform="translate(400,250)">${drawMCB(0,0,['M','CH','CH–Ph','CH'])}</g>
+        <text x="400" y="360" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">[2+2] WITH FIRST MONOMER</text>`,
+    4: `<g transform="translate(400,250)">${drawMCB(0,0,['M','CH','~~','CH'])}</g>
+        <text x="400" y="360" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#2d5f3f">metallacyclobutane between growing chain and new monomer</text>`,
+    5: `
+      ${drawAlkylidene(150, 240, '~chain')}
+      <g transform="translate(350,240)">
+        <text x="-10" y="5" class="mol-atom" font-size="12">~</text>
+        <path d="M 0 0 L 12 -10 L 24 0 L 36 -10 L 48 0 L 60 -10 L 72 0 L 84 -10 L 96 0 L 108 -10 L 120 0" class="mol-bond"/>
+        <line x1="14" y1="-7" x2="22" y2="-3" class="mol-bond"/>
+        <line x1="62" y1="-7" x2="70" y2="-3" class="mol-bond"/>
+        <line x1="110" y1="-7" x2="118" y2="-3" class="mol-bond"/>
+        <text x="130" y="5" class="mol-atom" font-size="12">~</text>
+      </g>
+      <text x="410" y="290" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">unsaturated polymer chain (step-growth)</text>
+      ${drawEthylene(650, 240)}
+      <text x="650" y="280" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d">ethylene ↑</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// --- Enyne scene ---
+function renderEnyne(step, sub) {
+  function alkyne(cx, cy, label) {
+    return `<g transform="translate(${cx},${cy})">
+      <text x="-35" y="5" text-anchor="end" class="mol-atom">HC</text>
+      <line x1="-25" y1="-5" x2="25" y2="-5" class="mol-dbond"/>
+      <line x1="-25" y1="0" x2="25" y2="0" class="mol-dbond"/>
+      <line x1="-25" y1="5" x2="25" y2="5" class="mol-dbond"/>
+      <text x="35" y="5" class="mol-atom">C–${label}</text>
+    </g>`;
+  }
+  function diene(cx, cy) {
+    return `<g transform="translate(${cx},${cy})">
+      <text x="-70" y="5" text-anchor="end" class="mol-atom">H₂C</text>
+      <line x1="-61" y1="-3" x2="-47" y2="-3" class="mol-dbond"/>
+      <line x1="-61" y1="3" x2="-47" y2="3" class="mol-dbond"/>
+      <line x1="-40" y1="0" x2="-20" y2="0" class="mol-bond"/>
+      <text x="-12" y="5" class="mol-atom">CH</text>
+      <line x1="5" y1="-3" x2="30" y2="-3" class="mol-dbond"/>
+      <line x1="5" y1="3" x2="30" y2="3" class="mol-dbond"/>
+      <text x="40" y="5" class="mol-atom">CH-Ph</text>
+    </g>`;
+  }
+
+  const stepMap = {
+    0: `
+      ${drawAlkylidene(160, 240, 'Ph')}
+      ${drawAlkene(480, 180, 'H₂C', 'CH–R', {spread: 55})}
+      ${alkyne(500, 320, 'Ph')}
+      <text x="500" y="360" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">alkene + alkyne substrates</text>
+    `,
+    1: `${drawAlkylidene(380, 240, 'Ph')} ${alkyne(620, 240, 'Ph')}`,
+    2: `${drawAlkylidene(260, 240, 'Ph')} ${alkyne(500, 240, 'Ph')} ${drawArrow(320, 232, 430, 232, 'coordinates', false)}`,
+    3: `
+      ${drawMCB(400, 250, ['M', 'CH', 'CH–Ph', 'C–Ph'])}
+      <!-- the internal C=C of the metallacyclobutene (remnant alkyne π-bond) -->
+      <line x1="428" y1="220" x2="428" y2="280" class="mol-bond"/>
+      <text x="400" y="370" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8543d" letter-spacing="0.1em">METALLACYCLOBUTENE</text>`,
+    4: `<g transform="translate(400,250)">
+        ${drawMetal(-80, 0, 24)}
+        <!-- M=CH -->
+        <line x1="-56" y1="-3" x2="-20" y2="-3" class="mol-dbond"/>
+        <line x1="-56" y1="3" x2="-20" y2="3" class="mol-dbond"/>
+        <text x="-12" y="5" class="mol-atom">CH</text>
+        <!-- single bond to next C -->
+        <line x1="4" y1="0" x2="24" y2="0" class="mol-bond"/>
+        <!-- =CH–Ph vinyl group with proper parallel double bond -->
+        <line x1="30" y1="-3" x2="58" y2="-3" class="mol-dbond"/>
+        <line x1="30" y1="3" x2="58" y2="3" class="mol-dbond"/>
+        <text x="66" y="5" class="mol-atom">CH–Ph</text>
+      </g>
+      <text x="400" y="360" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-style="italic" fill="#2d5f3f">vinyl carbene intermediate — reacts with alkene to release diene</text>`,
+    5: `
+      ${drawAlkylidene(130, 240, 'H')}
+      ${diene(520, 240)}
+      <text x="520" y="285" text-anchor="middle" font-family="Fraunces, serif" font-size="14" font-style="italic" fill="#2d5f3f">1,3-diene product</text>
+      <text x="400" y="340" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#3a4657">atom-economical — no byproduct released</text>
+    `,
+  };
+  return stepMap[step] || stepMap[0];
+}
+
+// ============================================================
+// UI UPDATERS
+// ============================================================
+
+function updateTitle() {
+  const rxn = getCurrentReaction();
+  const sub = getCurrentSubstrate();
+  document.getElementById('stage-title').innerHTML = `${rxn.name.replace('Metathesis', '<em>Metathesis</em>')} · ${sub.label}`;
+  document.getElementById('stage-badge').textContent = `Step ${state.step} / ${TOTAL_STEPS-1} · ${STEP_NAMES[state.step]}`;
+}
+
+function updateStepDesc() {
+  const info = stepText(state.reaction, state.step, state);
+  document.getElementById('step-desc').innerHTML = `<strong>${info.title}</strong>${info.body}`;
+}
+
+function updateTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'tl-line' + (i <= state.step ? ' done' : '');
+      tl.appendChild(line);
+    }
+    const dot = document.createElement('div');
+    dot.className = 'tl-dot' + (i === state.step ? ' active' : (i < state.step ? ' done' : ''));
+    dot.textContent = i;
+    tl.appendChild(dot);
+  }
+}
+
+function updateCatalystProfile() {
+  const cat = CATALYSTS[state.catalyst];
+  document.getElementById('cat-activity').textContent = `${cat.activity}/5`;
+  document.getElementById('cat-tolerance').textContent = `${cat.tolerance}/5`;
+  document.getElementById('cat-init').textContent = `${cat.init}/5`;
+  renderBar('bar-activity', cat.activity, 'filled');
+  renderBar('bar-tolerance', cat.tolerance, 'filled-gold');
+  renderBar('bar-init', cat.init, 'filled-rust');
+  document.getElementById('hint-text').innerHTML = `<strong>${cat.name}.</strong> ${cat.notes}`;
+}
+
+function renderBar(id, val, cls) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'bar-seg' + (i < val ? ' ' + cls : '');
+    el.appendChild(seg);
+  }
+}
+
+function updateReadout() {
+  const rxn = getCurrentReaction();
+  const sub = getCurrentSubstrate();
+  const cat = CATALYSTS[state.catalyst];
+  document.getElementById('driver').textContent = rxn.driver;
+  document.getElementById('ez-ratio').textContent = `E : Z  ≈  ${cat.ez}`;
+  document.getElementById('product-name').textContent = sub.product;
+  document.getElementById('turnover-count').textContent = state.turnovers;
+  document.getElementById('ethylene-count').textContent = state.ethylene;
+}
+
+function populateSubstrates() {
+  const rxn = getCurrentReaction();
+  const group = document.getElementById('sub-group');
+  group.innerHTML = '';
+  rxn.substrates.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pill' + (i === state.substrateIdx ? ' active' : '');
+    btn.dataset.sub = i;
+    btn.innerHTML = `${s.label}`;
+    btn.style.textAlign = 'left';
+    btn.style.fontSize = '10.5px';
+    group.appendChild(btn);
+    btn.addEventListener('click', () => {
+      state.substrateIdx = i;
+      state.step = 0;
+      state.turnovers = 0;
+      state.ethylene = 0;
+      [...group.children].forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      refresh();
+    });
+  });
+}
+
+// ============================================================
+// CONTROL HANDLERS
+// ============================================================
+
+function refresh() {
+  renderScene();
+  updateTitle();
+  updateStepDesc();
+  updateTimeline();
+  updateCatalystProfile();
+  updateReadout();
+  updatePlayButton();
+}
+
+function stepForward() {
+  const rxn = getCurrentReaction();
+  if (state.step < TOTAL_STEPS - 1) {
+    state.step++;
+  } else {
+    // completed a cycle — increment counters, reset to step 1 if polymerization
+    state.turnovers++;
+    if (rxn.ethylenePerCycle > 0) state.ethylene += rxn.ethylenePerCycle;
+    if (rxn.isPolymer && state.turnovers < 12) {
+      state.step = 1; // next monomer
+    } else {
+      state.step = 0; // full reset for non-polymer, or polymer at cap
+      if (state.playing) stopPlay();
+    }
+  }
+  refresh();
+}
+
+function resetAll() {
+  state.step = 0;
+  state.turnovers = 0;
+  state.ethylene = 0;
+  stopPlay();
+  refresh();
+}
+
+function togglePlay() {
+  if (state.playing) stopPlay();
+  else startPlay();
+}
+function startPlay() {
+  state.playing = true;
+  updatePlayButton();
+  const tick = () => {
+    if (!state.playing) return;
+    stepForward();
+    state.playTimer = setTimeout(tick, 1200);
+  };
+  tick();
+}
+function stopPlay() {
+  state.playing = false;
+  clearTimeout(state.playTimer);
+  state.playTimer = null;
+  updatePlayButton();
+}
+function updatePlayButton() {
+  const btn = document.getElementById('btn-play');
+  if (state.playing) {
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2h4v12H3V2zM9 2h4v12H9V2z"/></svg>Pause`;
+    btn.classList.add('pulsing');
+  } else {
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2v12l10-6L3 2z"/></svg>${state.step === 0 ? 'Start' : 'Play'}`;
+    btn.classList.remove('pulsing');
+  }
+}
+
+// ============================================================
+// EVENT WIRING
+// ============================================================
+
+// reaction pills
+document.getElementById('rxn-group').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if (!btn) return;
+  state.reaction = btn.dataset.rxn;
+  state.substrateIdx = 0;
+  state.step = 0;
+  state.turnovers = 0;
+  state.ethylene = 0;
+  stopPlay();
+  [...document.getElementById('rxn-group').children].forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  populateSubstrates();
+  refresh();
+});
+
+// catalyst pills
+document.getElementById('cat-group').addEventListener('click', (e) => {
+  const btn = e.target.closest('.cat-pill');
+  if (!btn) return;
+  state.catalyst = btn.dataset.cat;
+  [...document.getElementById('cat-group').children].forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  refresh();
+});
+
+// control buttons
+document.getElementById('btn-step').addEventListener('click', () => {
+  if (state.playing) stopPlay();
+  stepForward();
+});
+document.getElementById('btn-reset').addEventListener('click', resetAll);
+document.getElementById('btn-play').addEventListener('click', togglePlay);
+
+// sliders
+document.getElementById('temp-slider').addEventListener('input', (e) => {
+  state.temp = +e.target.value;
+  document.getElementById('temp-val').textContent = state.temp + ' °C';
+});
+document.getElementById('load-slider').addEventListener('input', (e) => {
+  state.load = +e.target.value;
+  document.getElementById('load-val').textContent = state.load + ' mol%';
+});
+
+// keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'ArrowRight' || e.key === 'n') { stepForward(); }
+  else if (e.key === 'r') { resetAll(); }
+});
+
+// boot
+populateSubstrates();
+refresh();
+</script>
+</body>
+</html>
